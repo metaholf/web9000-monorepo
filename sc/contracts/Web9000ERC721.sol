@@ -91,7 +91,7 @@ contract Web9000ERC721 is
 
     function mint(
         uint256 releaseId_, uint256 leafId_, bytes32[] memory merkleProof_
-    ) external payable virtual {
+    ) external virtual {
         require(releaseId_ < totalReleases, "Web9000ERC721: wrong releaseId");
         require(_verify(releaseId_, _msgSender(), leafId_, merkleProof_), "Web9000ERC721: invalid proof or wrong data");
         require(!claimed[releaseId_][leafId_], "Web9000ERC721: already claimed");
@@ -109,6 +109,14 @@ contract Web9000ERC721 is
 
         claimed[releaseId_][leafId_] = true;
         tokenIdCounter += 1;
+    }
+
+    function getAllReleases() external view returns(bytes32[] memory) {
+        bytes32[] memory result = new bytes32[](totalReleases);
+        for (uint256 i = 0; i < totalReleases; i++) {
+            result[i] = releases[i];
+        }
+        return result;
     }
 
     function checkClaim(uint256 releaseId_, address target_, uint256 leafId_, bytes32[] memory merkleProof_) external view returns(bool) {
@@ -132,7 +140,7 @@ contract Web9000ERC721 is
     //
 
     function _verify(uint256 releaseId, address _target, uint256 _leafId, bytes32[] memory _merkleProof) internal view returns(bool) {
-        bytes32 node = keccak256(abi.encodePacked(_target, _leafId));
+        bytes32 node = keccak256(abi.encodePacked(releaseId, _target, _leafId));
         return(MerkleProofUpgradeable.verify(_merkleProof, releases[releaseId], node));
     }
 
