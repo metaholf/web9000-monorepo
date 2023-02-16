@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, Input, View, Title } from '@vkontakte/vkui';
+import { FC_ADDRESS, IMPLEMENT_ADDRESS } from '../config';
 
 const CreateMerkleTree = ({ id, go }) => {
   const [nodes, setNodes] = useState([{ to_address: '' }])
@@ -19,16 +20,34 @@ const CreateMerkleTree = ({ id, go }) => {
   const isDisabled = nodes.find(el => !el.to_address)
 
   const handleCreate = async () => {
-    fetch('http://localhost:4000/merkle-tree', {
-      method: 'POST',
-      body: JSON.stringify(nodes),
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
+    let response = await fetch('http://localhost:4000/merkle-tree', {
+        method: 'POST',
+        body: JSON.stringify(nodes),
+        referrerPolicy: 'no-referrer',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        }
+      });
+      let dataTx = await response.json();
+      console.log(dataTx);
+
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const from = accounts[0];
+
+      // prepare data for createRelease tx
+      const txParams = {
+        from: from,
+        to: "0xe9760583fa417738e5a0e2f5275b883938c4086a",
+        value: '0',
+        data: dataTx.data
       }
-    })
-      .then(response => response.json())
-      .then(json => console.log(json))
+  
+      const tx = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [txParams],
+      })
+
 
     return
   }

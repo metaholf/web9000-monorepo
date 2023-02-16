@@ -9,13 +9,14 @@ const { txDataCreate } = require('./src/controllers/txDataCreate');
 app.use(cors());
 app.use(express.json())
 
-app.get('/test', (res) => {
+app.get('/test', (req, res) => {
   res.send('Hello World!')
 })
 
 app.post(config.GET_MERKLE_ROOT, merkleTreeController)
 
 app.post(config.FACTORY_DATA, txDataCreate)
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

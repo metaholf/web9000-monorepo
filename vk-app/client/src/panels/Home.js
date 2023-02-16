@@ -35,6 +35,7 @@ const Home = ({ id, go, fetchedUser }) => {
 		const response = await fetch('http://localhost:4000/factory-data', {
 			method: 'POST',
 			body: JSON.stringify(["0xd53C26eeFeBd6fd58fd19485F5093d906f1b1A89", name, symbol, salt.toFixed(0)]),
+			referrerPolicy: 'no-referrer',
 			headers: {
 				'Access-Control-Allow-Origin': '*',
 				'Content-Type': 'application/json',
@@ -59,7 +60,7 @@ const Home = ({ id, go, fetchedUser }) => {
 
 		// console.log(tx)
 		// if (sign)
-		// 	go('createMerkleTree')
+		go('createMerkleTree')
 		// return
 	}
 	return (
@@ -78,7 +79,6 @@ const Home = ({ id, go, fetchedUser }) => {
 						<Input placeholder='name' onChange={({ target: { value } }) => setName(value)} value={name} />
 						<Input placeholder='symbol' onChange={({ target: { value } }) => setSymbol(value)} value={symbol} />
 					</Div>
-
 					<Div>
 						<Button disabled={!name.length || !symbol.length} stretched size="l" mode="secondary" onClick={handleCreate}>
 							Create
