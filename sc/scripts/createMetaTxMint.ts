@@ -5,12 +5,11 @@ async function main() {
   const signers = await ethers.getSigners();
   const network = await ethers.provider.getNetwork();
   const targetRelayer = "0xf081791aA828f0f6470f9168610A7F2e80911476";
-  const targetContract = "0x784384762f0E70EEE87289d4208B26b9b356cE22";
+  const targetContract = "0x1079899b43c6ca901996e4f6c3bd03724b2ec08d";
   const targetValue = "0";
   const targetGas = "1000000";
   const targetNonce = (await (await ethers.getContractFactory("Web9000Relayer")).attach(targetRelayer).getNonce(signers[0].address)).toString();
-  const salt = (ethers.BigNumber.from(ethers.utils.randomBytes(32))).toString();
-  const targetData = (await ethers.getContractFactory("Web9000Factory")).interface.encodeFunctionData("deployERC721", ["0xd53C26eeFeBd6fd58fd19485F5093d906f1b1A89", "TOKENC", "TOKENC", salt])
+  const targetData = (await ethers.getContractFactory("Web9000ERC721")).interface.encodeFunctionData("mint", ["0", "0", ["0xe261769c8b53fe0ca612579e5c47a4cfb43aeb610fada0e1cd9b3d4ed1fa9b1b", "0x56fa3d3015b252b76a15c6dfa5ece8bc23ab7a34bd830a98f53826fcc32acea4"]]);
 
   const EIP712Domain = {
     name: "MinimalForwarder",

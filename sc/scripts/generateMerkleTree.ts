@@ -37,7 +37,7 @@ async function main() {
 
   console.log("Root hash:", root);
 
-  const leaf = elems[2];
+  const leaf = elems[0];
 
   const proof = merkleTree.getHexProof(leaf);
 
