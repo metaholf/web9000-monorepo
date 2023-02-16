@@ -1,5 +1,5 @@
 {
-  "name": "artwhale-markerplace-contracts",
+  "name": "web9000-smart-contracts",
   "version": "0.1.0",
   "scripts": {
     "build": "hardhat compile",
