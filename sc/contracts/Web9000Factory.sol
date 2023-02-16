@@ -5,9 +5,12 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
+
 import "./Web9000ERC721.sol";
 
 contract Web9000Factory is ERC2771Context {
+
+    address public trustedForwarder;
 
     struct Collection {
         address sc;
@@ -22,6 +25,10 @@ contract Web9000Factory is ERC2771Context {
         address indexed newContract,
         Collection collection
     );
+
+    constructor(address trustedForwarder_) ERC2771Context(trustedForwarder_) {
+        trustedForwarder = trustedForwarder_;
+    }
 
     function deployArtWhaleERC721(
         address implementation_,
@@ -40,12 +47,12 @@ contract Web9000Factory is ERC2771Context {
 
         _collections.push(newCollection);
 
-        Web9000ERC721(instance).initialize(name_, symbol_, _msgSender());
+        Web9000ERC721(instance).initialize(name_, symbol_, _msgSender(), trustedForwarder);
 
         emit DeployArtWhaleERC721(
             _msgSender(),
             address(instance),
-            collection
+            newCollection
         );
 
         return instance;
