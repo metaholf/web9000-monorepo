@@ -6,10 +6,11 @@ pragma solidity 0.8.13;
 // inheritance
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "./ERC2771ContextFixed.sol";
 
 // libs
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol";
 
@@ -17,21 +18,23 @@ contract Web9000ERC721 is
     Initializable,
     ERC721Upgradeable,
     ERC721EnumerableUpgradeable,
-    ERC2771ContextUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    ERC2771ContextFixed
 {
 
-    mapping(uint256 => bool) public releases;
+    uint256 public tokenIdCounter;
+    uint256 public totalReleases;
+    mapping(uint256 => bytes32) public releases;
+    mapping(uint256 => mapping(uint256 => bool)) public claimed;
 
-    // event Mint(
-    //     address indexed target,
-    //     uint256 indexed tokenId,
-    //     string uri,
-    //     uint256 mintPrice,
-    //     uint256 nonce,
-    //     uint256 deadline,
-    //     bytes signature
-    // );
+    event Mint(
+        address indexed target,
+        uint256 indexed releaseId,
+        uint256 leafId,
+        uint256 tokenId,
+        bytes32[] proof,
+        uint256 timestamp
+    );
 
     //
     // proxy constructor
@@ -43,15 +46,17 @@ contract Web9000ERC721 is
     function initialize(
         string memory name_,
         string memory symbol_,
-        address owner_
+        address owner_,
+        address trustedForwarder_
     ) external initializer {
-        __Web9000ERC721_init(name_, symbol_, owner_);
+        __Web9000ERC721_init(name_, symbol_, owner_, trustedForwarder_);
     }
 
     function __Web9000ERC721_init(
         string memory name_,
         string memory symbol_,
-        address owner_
+        address owner_,
+        address trustedForwarder_
     ) internal onlyInitializing {
         __ERC721_init_unchained(name_, symbol_);
         __ERC721Enumerable_init_unchained();
@@ -60,83 +65,62 @@ contract Web9000ERC721 is
         __Web9000ERC721_init_unchained(
             name_,
             symbol_,
-            owner_
+            owner_,
+            trustedForwarder_
         );
     }
 
     function __Web9000ERC721_init_unchained(
         string memory,
         string memory,
-        address owner_
+        address owner_,
+        address trustedForwarder_
     ) internal onlyInitializing {
         _transferOwnership(owner_);
+        _setTrustedForwarder(trustedForwarder_);
     }
 
     //
     // external methods
     //
 
-    function setURI(
-        uint256 tokenId_,
-        string memory uri_
-    ) external virtual onlyOperator {
-        _setTokenURI(tokenId_, uri_);
+    function createRelease(bytes32 merkleRoot_) external onlyOwner {
+        releases[totalReleases] = merkleRoot_;
+        totalReleases += 1;
     }
 
     function mint(
-        address target_,
-        uint256 tokenId_,
-        string memory uri_,
-        uint256 mintPrice_,
-        uint256 nonce_,
-        uint256 deadline_,
-        bytes memory signature_
-    ) external payable virtual {
-        require(!nonces[nonce_], "Web9000ERC721: nonce already used");
-        require(
-            block.timestamp <= deadline_,
-            "Web9000ERC721: expired deadline"
-        );
-        require(msg.value == mintPrice_, "Web9000ERC721: wrong mint price");
+        uint256 releaseId_, uint256 leafId_, bytes32[] memory merkleProof_
+    ) external virtual {
+        require(releaseId_ < totalReleases, "Web9000ERC721: wrong releaseId");
+        require(_verify(releaseId_, _msgSender(), leafId_, merkleProof_), "Web9000ERC721: invalid proof or wrong data");
+        require(!claimed[releaseId_][leafId_], "Web9000ERC721: already claimed");
 
-        payable(operator()).sendValue(msg.value);
-
-        bytes32 structHash = keccak256(
-            abi.encode(
-                MINT_TYPEHASH,
-                target_,
-                tokenId_,
-                keccak256(bytes(uri_)),
-                mintPrice_,
-                nonce_,
-                deadline_
-            )
-        );
-
-        bytes32 digest = _hashTypedDataV4(structHash);
-
-        require(
-            SignatureCheckerUpgradeable.isValidSignatureNow(
-                operator(),
-                digest,
-                signature_
-            ),
-            "Web9000ERC721: invalid signature"
-        );
-
-        nonces[nonce_] = true;
-        _mint(target_, tokenId_);
-        _setTokenURI(tokenId_, uri_);
+        _mint(_msgSender(), tokenIdCounter);
 
         emit Mint({
-            target: target_,
-            tokenId: tokenId_,
-            uri: uri_,
-            mintPrice: mintPrice_,
-            nonce: nonce_,
-            deadline: deadline_,
-            signature: signature_
+            target: _msgSender(),
+            releaseId: releaseId_,
+            leafId: leafId_,
+            tokenId: tokenIdCounter,
+            proof: merkleProof_,
+            timestamp: block.timestamp
         });
+
+        claimed[releaseId_][leafId_] = true;
+        tokenIdCounter += 1;
+    }
+
+    function getAllReleases() external view returns(bytes32[] memory) {
+        bytes32[] memory result = new bytes32[](totalReleases);
+        for (uint256 i = 0; i < totalReleases; i++) {
+            result[i] = releases[i];
+        }
+        return result;
+    }
+
+    function checkClaim(uint256 releaseId_, address target_, uint256 leafId_, bytes32[] memory merkleProof_) external view returns(bool) {
+        return (_verify(releaseId_, target_, leafId_, merkleProof_));
     }
 
     function tokenURI(
@@ -145,11 +129,24 @@ contract Web9000ERC721 is
         public
         view
         virtual
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
+        override(ERC721Upgradeable)
         returns (string memory)
     {
         return super.tokenURI(tokenId_);
     }
+
+    //
+    // internal method
+    //
+
+    function _verify(uint256 releaseId, address _target, uint256 _leafId, bytes32[] memory _merkleProof) internal view returns(bool) {
+        bytes32 node = keccak256(abi.encodePacked(releaseId, _target, _leafId));
+        return(MerkleProofUpgradeable.verify(_merkleProof, releases[releaseId], node));
+    }
+
+    //
+    // overriden methods
+    //
 
     function supportsInterface(
         bytes4 interfaceId_
@@ -160,116 +157,28 @@ contract Web9000ERC721 is
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
         returns (bool)
     {
-        return
-            interfaceId_ == type(IRoyalty).interfaceId ||
-            super.supportsInterface(interfaceId_);
+        return super.supportsInterface(interfaceId_);
     }
-
-    //
-    // overridden methods for creator fees (https://support.opensea.io/hc/en-us/articles/1500009575482)
-    //
-
-    function setApprovalForAll(
-        address operator_,
-        bool approved_
-    )
-        public
-        virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
-        onlyAllowedOperatorApproval(operator_)
-    {
-        super.setApprovalForAll(operator_, approved_);
-    }
-
-    function approve(
-        address operator_,
-        uint256 tokenId_
-    )
-        public
-        virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
-        onlyAllowedOperatorApproval(operator_)
-    {
-        super.approve(operator_, tokenId_);
-    }
-
-    function transferFrom(
-        address from_,
-        address to_,
-        uint256 tokenId_
-    )
-        public
-        virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
-        onlyAllowedOperator(from_)
-    {
-        super.transferFrom(from_, to_, tokenId_);
-    }
-
-    function safeTransferFrom(
-        address from_,
-        address to_,
-        uint256 tokenId_
-    )
-        public
-        virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
-        onlyAllowedOperator(from_)
-    {
-        super.safeTransferFrom(from_, to_, tokenId_);
-    }
-
-    function safeTransferFrom(
-        address from_,
-        address to_,
-        uint256 tokenId_,
-        bytes memory data_
-    )
-        public
-        virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
-        onlyAllowedOperator(from_)
-    {
-        super.safeTransferFrom(from_, to_, tokenId_, data_);
-    }
-
-    //
-    // internal methods
-    //
 
     function _beforeTokenTransfer(
         address from_,
         address to_,
-        uint256 tokenId_
+        uint256 tokenId_,
+        uint256 batchSize
     )
         internal
         virtual
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
-        super._beforeTokenTransfer(from_, to_, tokenId_);
+        super._beforeTokenTransfer(from_, to_, tokenId_, batchSize);
     }
 
-    function _beforeConsecutiveTokenTransfer(
-        address from,
-        address to,
-        uint256 first,
-        uint96 size
-    )
-        internal
-        virtual
-        override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
-    {
-        super._beforeConsecutiveTokenTransfer(from, to, first, size);
+    function _msgSender() internal view virtual override(ContextUpgradeable, ERC2771ContextFixed) returns (address sender) {
+        return(ERC2771ContextFixed._msgSender());
     }
 
-    function _burn(
-        uint256 tokenId_
-    )
-        internal
-        virtual
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
-    {
-        super._burn(tokenId_);
-        _resetTokenRoyalty(tokenId_);
+    function _msgData() internal view virtual override(ContextUpgradeable, ERC2771ContextFixed) returns (bytes calldata) {
+        return(ERC2771ContextFixed._msgData());
     }
+
 }
