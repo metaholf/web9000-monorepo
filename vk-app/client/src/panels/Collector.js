@@ -27,7 +27,7 @@ const Collector = () => {
             id="tab-list"
             aria-controls="tab-content-all"
           >
-            All Releases
+            All collections
           </TabsItem>
           <TabsItem
             selected={tab === 'own'}

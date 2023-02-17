@@ -6,6 +6,7 @@ const buttonGridStyle = { width: '100%', height: '100%', display: 'flex', flexDi
 
 export const AllCollection = ({ selectCollection }) => {
   const { list, load } = useAllCollectionList()
+  console.log(list)
 
   if (load) return (
     <Div>
@@ -14,7 +15,7 @@ export const AllCollection = ({ selectCollection }) => {
 
   return (
     <Div>
-      <Title>All Collections</Title>
+      <Title>Select interested collection:</Title>
       <Spacing size={40} />
       <CardGrid>
         {list.length ? [...list].reverse().map((item) =>

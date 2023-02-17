@@ -8,7 +8,7 @@ export const OwnReleases = () => {
     <Div>
       <Title>OwnReleases</Title>
       <Spacing size={40} />
-      <Button onClick={handleClick}>Action</Button>
+      <Button onClick={handleClick}>Mint</Button>
     </Div>
   )
 }

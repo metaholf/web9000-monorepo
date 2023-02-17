@@ -2,6 +2,8 @@ import { CardGrid, Div, Spinner, Card, Button, Title, Spacing } from "@vkontakte
 import { useCollectionList } from "../hooks/useCollectionList"
 import { shortAddress } from "../utils/shortAddress"
 
+const buttonGridStyle = { width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '20px' }
+
 export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
   const { list, load } = useCollectionList()
 
