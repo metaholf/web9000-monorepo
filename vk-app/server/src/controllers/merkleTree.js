@@ -726,18 +726,21 @@ const merkleTreeController = async (req, res) => {
 
     // console.log("Root hash:", root);
 
-    nodes.forEach(async (element, i) => {
 
+    for (let i = 0; i < nodes.length; i++) {
+
+      //
+      // for user proof data
+      //
       let userProofState;
       try {
-        userProofState = await db.get(`proofs-${element}`) 
+        userProofState = await db.get(`proofs-${nodes[i]}`) 
         userProofState = JSON.parse(userProofState);
         // console.log("old");
       } catch (error) {
         userProofState = {};
         // console.log("new");
       }
-
       let data = JSON.stringify({
         collection: collection,
         releaseId: releaseId,
@@ -745,7 +748,6 @@ const merkleTreeController = async (req, res) => {
         proof: merkleTree.getHexProof(elems[i]),
         root: root
       });
-
       userProofState[keccak256(data).toString('hex')] = {
         collection: collection,
         releaseId: releaseId,
@@ -755,15 +757,55 @@ const merkleTreeController = async (req, res) => {
       }
       // console.log(userProofState);
       userProofState = JSON.stringify(userProofState);
+      await db.put(`proofs-${nodes[i]}`, userProofState);
 
-      await db.put(`proofs-${element}`, userProofState);
-    });
+      //
+      // for collection data
+      //
+      let collectionState;
+      try {
+        collectionState = await db.get(`collection-${collection}`) 
+        collectionState = JSON.parse(collectionState);
+      } catch (error) {
+        collectionState = {};
+      }
+      collectionState[keccak256(data).toString('hex')] = {
+        collection: collection,
+        releaseId: releaseId,
+        leafId: i,
+        proof: merkleTree.getHexProof(elems[i]),
+        root: root
+      }
+      collectionState = JSON.stringify(collectionState);
+      await db.put(`collection-${collection}`, collectionState);
+
+    }
 
     res.send(JSON.stringify({root: root}))
 
   } else
     res.send('invalid data')
 }
+
+
+const getCollectionTokens = async (req, res) => {
+  if (req.body) {
+    const collection = req.body.collection
+    
+    let collectionState;
+    try {
+      collectionState = await db.get(`collection-${collection}`) 
+      collectionState = JSON.parse(collectionState);
+    } catch (error) {
+      collectionState = {};
+    }
+
+    res.send(JSON.stringify({result: collectionState}))
+
+  } else
+    res.send('invalid data')
+}
+
 
 const getProofsController = async (req, res) => {
   if (req.body) {
@@ -794,4 +836,4 @@ const getProofsController = async (req, res) => {
     res.send('invalid data')
 }
 
-module.exports = {merkleTreeController, getProofsController}
+module.exports = {merkleTreeController, getProofsController, getCollectionTokens}

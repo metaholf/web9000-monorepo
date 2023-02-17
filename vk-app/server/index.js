@@ -4,7 +4,7 @@ const app = express();
 const port = config.PORT;
 const cors = require('cors');
 const rateLimit = require('express-rate-limit')
-const { merkleTreeController, getProofsController } = require('./src/controllers/merkleTree');
+const { merkleTreeController, getProofsController, getCollectionTokens } = require('./src/controllers/merkleTree');
 const { txDataCreate } = require('./src/controllers/txDataCreate');
 const { relayerController } = require('./src/controllers/relayer');
 
@@ -29,6 +29,7 @@ app.post(config.FACTORY_DATA, txDataCreate)
 
 app.post(config.RELAYER, apiLimiter, relayerController)
 
+app.post(config.COLLECTION_TOKENS, getCollectionTokens)
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

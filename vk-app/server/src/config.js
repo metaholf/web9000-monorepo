@@ -9,6 +9,7 @@ const routes = {
   GET_MERKLE_PROOFS: '/merkle-tree-proofs',
   FACTORY_DATA: '/factory-data',
   RELAYER: '/sendWithRelayer',
+  COLLECTION_TOKENS: '/getCollectionTokens',
 }
 
 const config = {
