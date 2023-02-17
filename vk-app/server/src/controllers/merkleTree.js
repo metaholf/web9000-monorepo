@@ -709,7 +709,7 @@ const ERC721_ABI = [
 
 const merkleTreeController = async (req, res) => {
   if (req.body) {
-    console.log(req.body)
+    // console.log(req.body)
     const releaseId = req.body.releaseId
     const nodes = req.body.nodes
     const collection = req.body.collection
