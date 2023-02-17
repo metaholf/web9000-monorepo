@@ -1,9 +1,9 @@
-const express = require('express')
+const express = require('express');
 const { config } = require('./src/config');
-const app = express()
-const port = config.PORT
+const app = express();
+const port = config.PORT;
 const cors = require('cors');
-const { merkleTreeController } = require('./src/controllers/merkleTree');
+const { merkleTreeController, getProofsController } = require('./src/controllers/merkleTree');
 const { txDataCreate } = require('./src/controllers/txDataCreate');
 
 app.use(cors());
@@ -14,6 +14,8 @@ app.get('/test', (req, res) => {
 })
 
 app.post(config.GET_MERKLE_ROOT, merkleTreeController)
+
+app.post(config.GET_MERKLE_PROOFS, getProofsController)
 
 app.post(config.FACTORY_DATA, txDataCreate)
 

@@ -1,7 +1,10 @@
 const { MerkleTree } = require('merkletreejs');
 const keccak256 = require('keccak256')
-const web3 = require('web3');
 const { ethers } = require('ethers')
+
+const { config } = require('../config');
+const level = require('level-rocksdb');
+const db = level(config.DB);
 
 const ERC721_ABI = [
   {
@@ -706,11 +709,14 @@ const ERC721_ABI = [
 
 const merkleTreeController = async (req, res) => {
   if (req.body) {
-    console.log(req.body)
-    const nodes = req.body
+    // console.log(req.body)
+    const releaseId = req.body.releaseId
+    const nodes = req.body.nodes
+    const collection = req.body.collection
+    // console.log(nodes)
     let elems = [];
     nodes.forEach((element, i) => {
-      let hash = web3.utils.soliditySha3(element.to_address, i);
+      let hash = ethers.solidityPackedKeccak256(["uint256", "address", "uint256"],[releaseId, element, i]);
       elems.push(hash);
     });
 
@@ -718,35 +724,74 @@ const merkleTreeController = async (req, res) => {
 
     const root = merkleTree.getHexRoot();
 
-    console.log("Root hash:", root);
+    // console.log("Root hash:", root);
 
-    const provider = new ethers.JsonRpcProvider('https://eth-goerli.g.alchemy.com/v2/0HXwg7aousuhqGHZcAs7YY5LVW-BLi4F')
-    contract = new ethers.Contract('0xe9760583fa417738e5a0e2f5275b883938c4086a', ERC721_ABI, provider)
-    const data = contract.interface.encodeFunctionData('createRelease', [root])
-    // res.send(JSON.stringify(data))
+    nodes.forEach(async (element, i) => {
 
-    // const leaf = elems[0];
+      let userProofState;
+      try {
+        userProofState = await db.get(`proofs-${element}`) 
+        userProofState = JSON.parse(userProofState);
+        // console.log("old");
+      } catch (error) {
+        userProofState = {};
+        // console.log("new");
+      }
 
-    // const proof = merkleTree.getHexProof(leaf);
+      let data = JSON.stringify({
+        collection: collection,
+        releaseId: releaseId,
+        leafId: i,
+        proof: merkleTree.getHexProof(elems[i]),
+        root: root
+      });
 
-    // console.log("Proof for contract: (elems[0])", proof);
-    // console.log(nodes)
-    // let elems = [];
-    // nodes.forEach((element, i) => {
-    //   let hash = web3.utils.soliditySha3(
-    //     element.metadata,
-    //     element.to_address,
-    //     i);
-    //   elems.push(hash);
-    // });
-    // console.log(elems)
-    // const merkleTree = new MerkleTree(elems, keccak256, { hashLeaves: false, sortPairs: true });
-    // console.log(merkleTree)
-    // const root = merkleTree.getHexRoot();
-    res.send(JSON.stringify({root: root, data: data}))
+      userProofState[keccak256(data).toString('hex')] = {
+        collection: collection,
+        releaseId: releaseId,
+        leafId: i,
+        proof: merkleTree.getHexProof(elems[i]),
+        root: root
+      }
+      // console.log(userProofState);
+      userProofState = JSON.stringify(userProofState);
+
+      await db.put(`proofs-${element}`, userProofState);
+    });
+
+    res.send(JSON.stringify({root: root}))
 
   } else
     res.send('invalid data')
 }
 
-exports.merkleTreeController = merkleTreeController
+const getProofsController = async (req, res) => {
+  if (req.body) {
+    const target = req.body.address
+    // console.log(target)
+
+    try {
+      userProofState = await db.get(`proofs-${target}`) 
+      userProofState = JSON.parse(userProofState);
+    } catch (error) {
+      userProofState = {};
+    }
+    // console.log(userProofState);
+
+    // const provider = new ethers.JsonRpcProvider('https://eth-goerli.g.alchemy.com/v2/0HXwg7aousuhqGHZcAs7YY5LVW-BLi4F')
+    
+    // Object.keys(userProofState).forEach(async (key) => {
+    //   let contract = new ethers.Contract(userProofState[key].collection, ERC721_ABI, provider)
+    //   console.log(userProofState[key].collection);
+    //   let releases = await contract.totalReleases();
+    //   console.log(releases.toString());
+
+    // });
+
+    res.send(JSON.stringify({result: userProofState}))
+
+  } else
+    res.send('invalid data')
+}
+
+module.exports = {merkleTreeController, getProofsController}
