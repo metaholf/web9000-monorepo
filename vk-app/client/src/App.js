@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
-import { View, ScreenSpinner, AdaptivityProvider, AppRoot, ConfigProvider, SplitLayout, SplitCol } from '@vkontakte/vkui';
+import {
+	TabsItem,
+	Tabs,
+	AdaptivityProvider,
+	AppRoot,
+	ConfigProvider,
+	Group,
+	PanelHeader,
+	Spacing,
+} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
-import Home from './panels/Home';
+import HomeCreator from './panels/HomeCreator';
+import HomeCollector from './panels/HomeCollector';
 import CreateMerkleTree from './panels/CreateMerkleTree';
+import { UserBlock } from './components/UserBlock';
 
 const App = () => {
 	const [scheme, setScheme] = useState('bright_light')
-	const [activePanel, setActivePanel] = useState('home');
 	const [fetchedUser, setUser] = useState(null);
-	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
+	const [selected, setSelected] = useState('creator');
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -22,27 +32,44 @@ const App = () => {
 		async function fetchData() {
 			const user = await bridge.send('VKWebAppGetUserInfo');
 			setUser(user);
-			setPopout(null);
 		}
 		fetchData();
 	}, []);
 
-	const go = panel => {
-		setActivePanel(panel);
-	};
 
 	return (
 		<ConfigProvider scheme={scheme}>
 			<AdaptivityProvider>
 				<AppRoot>
-					<SplitLayout popout={popout}>
-						<SplitCol>
-							<View activePanel={activePanel}>
-								<Home id='home' fetchedUser={fetchedUser} go={go} />
-								<CreateMerkleTree id='createMerkleTree' go={go} />
-							</View>
-						</SplitCol>
-					</SplitLayout>
+					<PanelHeader>WEB9000</PanelHeader>
+					{fetchedUser && <UserBlock data={fetchedUser} />}
+					<Tabs style={{ borderRadius: '6px', background: '#fff' }}>
+						<TabsItem
+							selected={selected === 'creator'}
+							onClick={() => setSelected('creator')}
+							id="tab-creator"
+							aria-controls="tab-content-creator"
+						>
+							Creator
+						</TabsItem>
+						<TabsItem
+							selected={selected === 'collector'}
+							onClick={() => setSelected('collector')}
+							id="tab-collector"
+							aria-controls="tab-content-collector"
+						>
+							Collector
+						</TabsItem>
+					</Tabs>
+					<Spacing size={10} />
+					{selected === 'creator'
+						&& <Group id="tab-content-creator" aria-labelledby="tab-creator" role="tabpanel">
+							<HomeCreator />
+						</Group>}
+					{selected === 'collector'
+						&& <Group id="tab-content-collector" aria-labelledby="tab-collector" role="tabpanel">
+							<HomeCollector />
+						</Group>}
 				</AppRoot>
 			</AdaptivityProvider>
 		</ConfigProvider>
