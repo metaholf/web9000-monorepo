@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { ethers } from "ethers";
 
 import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, Input, View } from '@vkontakte/vkui';
 import { FC_ADDRESS, IMPLEMENT_ADDRESS } from '../config';
@@ -44,23 +45,34 @@ const Home = ({ id, go, fetchedUser }) => {
 		const dataTx = await response.json()
 		console.log(dataTx)
 
-		const txParams = {
-			from: from,
-			to: FC_ADDRESS,
-			value: '0',
-			data: dataTx
-		}
+		// const txParams = {
+		// 	from: from,
+		// 	to: FC_ADDRESS,
+		// 	value: '0',
+		// 	data: dataTx
+		// }
 
-		const tx = await window.ethereum.request({
-			method: 'eth_sendTransaction',
-			params: [txParams],
-		})
+		// WORKS! =)
+		const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+		const signer = provider.getSigner()
+		let contract = new ethers.Contract(
+			FC_ADDRESS,
+			[{"inputs":[{"internalType":"address","name":"trustedForwarder_","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"components":[{"internalType":"address","name":"sc","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"}],"indexed":false,"internalType":"struct Web9000Factory.Collection","name":"collection","type":"tuple"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"DeployERC721","type":"event"},{"inputs":[{"internalType":"address","name":"implementation_","type":"address"},{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"},{"internalType":"uint256","name":"salt_","type":"uint256"}],"name":"deployERC721","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAllCollections","outputs":[{"components":[{"internalType":"address","name":"sc","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"}],"internalType":"struct Web9000Factory.Collection[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"target","type":"address"}],"name":"getAllCollectionsByOwner","outputs":[{"components":[{"internalType":"address","name":"sc","type":"address"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"}],"internalType":"struct Web9000Factory.Collection[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"forwarder","type":"address"}],"name":"isTrustedForwarder","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"trustedForwarder","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}],
+			signer
+		);
+		console.log(contract)
+		let result = await contract.deployERC721("0xd53C26eeFeBd6fd58fd19485F5093d906f1b1A89", name, symbol, salt.toFixed(0));
 
-		console.log(tx)
+		// const tx = await window.ethereum.request({
+		// 	method: 'eth_sendTransaction',
+		// 	params: [txParams],
+		// })
+
+		console.log(result)
 
 		// console.log(tx)
 		// if (sign)
-		go('createMerkleTree')
+		// go('createMerkleTree')
 		// return
 	}
 	return (
