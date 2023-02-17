@@ -16,6 +16,31 @@ export const useCollectionList = () => {
       setList(res)
       setLoad(false)
     } catch (err) {
+      console.log('Get all collections by owner:', err)
+      setLoad(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!list.length)
+      getList()
+  }, [list])
+
+  return { load, list }
+}
+
+export const useAllCollectionList = () => {
+  const [list, setList] = useState([])
+  const [load, setLoad] = useState(false)
+
+  const getList = async () => {
+    try {
+      setLoad(true)
+      const factoryContract = getFactoryContract()
+      const res = await factoryContract.getAllCollections()
+      setList(res)
+      setLoad(false)
+    } catch (err) {
       console.log('Get all collections:', err)
       setLoad(false)
     }

@@ -12,15 +12,14 @@ import {
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
-import HomeCreator from './panels/HomeCreator';
-import HomeCollector from './panels/HomeCollector';
-import CreateMerkleTree from './panels/CreateMerkleTree';
+import Creator from './panels/Creator';
+import Collector from './panels/Collector';
 import { UserBlock } from './components/UserBlock';
 
 const App = () => {
 	const [scheme, setScheme] = useState('bright_light')
 	const [fetchedUser, setUser] = useState(null);
-	const [selected, setSelected] = useState('creator');
+	const [selected, setSelected] = useState('collector');
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -65,11 +64,11 @@ const App = () => {
 						<Spacing size={30} />
 						{selected === 'creator'
 							&& <Group id="tab-content-creator" aria-labelledby="tab-creator" role="tabpanel">
-								<HomeCreator />
+								<Creator />
 							</Group>}
 						{selected === 'collector'
 							&& <Group id="tab-content-collector" aria-labelledby="tab-collector" role="tabpanel">
-								<HomeCollector />
+								<Collector />
 							</Group>}
 					</Group>
 				</AppRoot>
