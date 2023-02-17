@@ -43,33 +43,35 @@ const App = () => {
 				<AppRoot>
 					<PanelHeader>WEB9000</PanelHeader>
 					{fetchedUser && <UserBlock data={fetchedUser} />}
-					<Tabs style={{ borderRadius: '6px', background: '#fff' }}>
-						<TabsItem
-							selected={selected === 'creator'}
-							onClick={() => setSelected('creator')}
-							id="tab-creator"
-							aria-controls="tab-content-creator"
-						>
-							Creator
-						</TabsItem>
-						<TabsItem
-							selected={selected === 'collector'}
-							onClick={() => setSelected('collector')}
-							id="tab-collector"
-							aria-controls="tab-content-collector"
-						>
-							Collector
-						</TabsItem>
-					</Tabs>
-					<Spacing size={10} />
-					{selected === 'creator'
-						&& <Group id="tab-content-creator" aria-labelledby="tab-creator" role="tabpanel">
-							<HomeCreator />
-						</Group>}
-					{selected === 'collector'
-						&& <Group id="tab-content-collector" aria-labelledby="tab-collector" role="tabpanel">
-							<HomeCollector />
-						</Group>}
+					<Group>
+						<Tabs >
+							<TabsItem
+								selected={selected === 'creator'}
+								onClick={() => setSelected('creator')}
+								id="tab-creator"
+								aria-controls="tab-content-creator"
+							>
+								Creator
+							</TabsItem>
+							<TabsItem
+								selected={selected === 'collector'}
+								onClick={() => setSelected('collector')}
+								id="tab-collector"
+								aria-controls="tab-content-collector"
+							>
+								Collector
+							</TabsItem>
+						</Tabs>
+						<Spacing size={30} />
+						{selected === 'creator'
+							&& <Group id="tab-content-creator" aria-labelledby="tab-creator" role="tabpanel">
+								<HomeCreator />
+							</Group>}
+						{selected === 'collector'
+							&& <Group id="tab-content-collector" aria-labelledby="tab-collector" role="tabpanel">
+								<HomeCollector />
+							</Group>}
+					</Group>
 				</AppRoot>
 			</AdaptivityProvider>
 		</ConfigProvider>
