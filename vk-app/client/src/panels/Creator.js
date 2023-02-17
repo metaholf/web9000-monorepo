@@ -4,7 +4,7 @@ import { CreateCollection } from '../modules/CreateCollection';
 import { CollectionList } from '../modules/CollectionList';
 import { CreateRelease } from '../modules/CreateRelease';
 
-const HomeCreator = () => {
+const Creator = () => {
 	const [tab, setTab] = useState('list');
 	const [page, setPage] = useState('collections')
 	const [selectedCollection, setSelectedCollection] = useState('')
@@ -53,4 +53,4 @@ const HomeCreator = () => {
 	)
 };
 
-export default HomeCreator;
+export default Creator;

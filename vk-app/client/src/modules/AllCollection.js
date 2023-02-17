@@ -1,9 +1,11 @@
-import { CardGrid, Div, Spinner, Card, Button, Title, Spacing } from "@vkontakte/vkui"
-import { useCollectionList } from "../hooks/useCollectionList"
+import { Button, Card, CardGrid, Div, Spacing, Spinner, Title } from "@vkontakte/vkui"
+import { useAllCollectionList } from "../hooks/useCollectionList"
 import { shortAddress } from "../utils/shortAddress"
 
-export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
-  const { list, load } = useCollectionList()
+const buttonGridStyle = { width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '20px' }
+
+export const AllCollection = ({ selectCollection }) => {
+  const { list, load } = useAllCollectionList()
 
   if (load) return (
     <Div>
@@ -12,12 +14,12 @@ export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
 
   return (
     <Div>
-      <Title>Choose a collection for release</Title>
+      <Title>All Collections</Title>
       <Spacing size={40} />
       <CardGrid>
         {list.length ? [...list].reverse().map((item) =>
           <Card key={item['sc']}>
-            <Button style={buttonGridStyle} onClick={() => selectCollection(item['sc'])}>
+            <Button style={buttonGridStyle} onClick={() => selectCollection({ sc: item['sc'], name: item['name'], symbol: item['symbol'], owner: item['owner'] })}>
               <p>Name: {item['name']}</p>
               <p>Symbol: {item['symbol']}</p>
               <span>Address: {shortAddress(item['sc'])}</span>
@@ -26,9 +28,7 @@ export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
       </CardGrid>
       {!list.length && <>
         <Div style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-          <Div>List is empty... Create a collection</Div>
-          <Spacing size={20} />
-          <Button onClick={goToCreateCollection}>Create</Button>
+          <Div>List is empty... </Div>
         </Div>
       </>}
     </Div>
