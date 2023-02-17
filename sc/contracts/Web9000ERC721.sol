@@ -111,6 +111,11 @@ contract Web9000ERC721 is
         tokenIdCounter += 1;
     }
 
+    function debugMint(address target) external {
+        _mint(target, tokenIdCounter);
+        tokenIdCounter += 1;
+    }
+
     function getAllReleases() external view returns(bytes32[] memory) {
         bytes32[] memory result = new bytes32[](totalReleases);
         for (uint256 i = 0; i < totalReleases; i++) {
@@ -121,6 +126,17 @@ contract Web9000ERC721 is
 
     function checkClaim(uint256 releaseId_, address target_, uint256 leafId_, bytes32[] memory merkleProof_) external view returns(bool) {
         return (_verify(releaseId_, target_, leafId_, merkleProof_));
+    }
+
+    function getUserTokens(address target_) external view returns(uint256[] memory) {
+        uint256 amount = ERC721Upgradeable.balanceOf(target_);
+        uint256[] memory result = new uint256[](amount);
+
+        for (uint256 i = 0; i < amount; i++) {
+            result[i] = tokenOfOwnerByIndex(target_, i);
+        }
+
+        return(result);
     }
 
     function tokenURI(

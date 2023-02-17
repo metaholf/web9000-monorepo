@@ -18,6 +18,10 @@ contract Web9000Factory is ERC2771Context {
         string name;
         string symbol;
     }
+    struct Call {
+        address target;
+        bytes callData;
+    }
 
     Collection[] private _collections;
     mapping(address => Collection[]) _collectionsByOwner;
@@ -66,6 +70,17 @@ contract Web9000Factory is ERC2771Context {
 
     function getAllCollectionsByOwner(address target) view external returns(Collection[] memory) {
         return _collectionsByOwner[target];
+    }
+
+    // multicall helper
+    function aggregateCall(Call[] memory calls) external view returns (uint256 blockNumber, bytes[] memory returnData) {
+        blockNumber = block.number;
+        returnData = new bytes[](calls.length);
+        for(uint256 i = 0; i < calls.length; i++) {
+            (bool success, bytes memory ret) = calls[i].target.staticcall(calls[i].callData);
+            require(success, "failed");
+            returnData[i] = ret;
+        }
     }
 
 }
