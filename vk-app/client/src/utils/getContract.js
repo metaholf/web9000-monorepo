@@ -1,4 +1,6 @@
 import { ethers } from 'ethers'
+import { FC_ADDRESS } from '../config';
+import FC_ABI from '../config/abi/fcAbi.json'
 
 export const getContract = (address, abi) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -6,3 +8,5 @@ export const getContract = (address, abi) => {
 
   return new ethers.Contract(address, abi, signer);
 }
+
+export const getFactoryContract = () => getContract(FC_ADDRESS, FC_ABI)

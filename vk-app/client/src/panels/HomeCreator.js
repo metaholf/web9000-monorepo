@@ -1,62 +1,55 @@
 import React, { useState } from 'react';
-import { Button, Div, Input, Spacing, Title } from '@vkontakte/vkui';
-import { FC_ADDRESS, IMPLEMENT_ADDRESS } from '../config';
-import FC_ABI from '../config/abi/fcAbi.json'
-import { getContract } from '../utils/getContract';
-import { switchChain } from '../utils/switchChain';
-
-function randomNumber(min, max) {
-	return Math.random() * (max - min) + min;
-}
+import { Group, Spacing, Tabs, TabsItem } from '@vkontakte/vkui';
+import { CreateCollection } from '../modules/CreateCollection';
+import { CollectionList } from '../modules/CollectionList';
+import { CreateRelease } from '../modules/CreateRelease';
 
 const HomeCreator = () => {
-	const [input, setInput] = useState({ name: '', symbol: '' })
-	const [loading, setLoading] = useState(false)
+	const [tab, setTab] = useState('list');
+	const [page, setPage] = useState('collections')
+	const [selectedCollection, setSelectedCollection] = useState('')
 
-	const handleInput = ({ target: { value, name } }) => {
-		setInput({ ...input, [name]: value })
+	const selectCollection = (address) => {
+		setSelectedCollection(address)
+		setPage('release')
+	}
+	const onBack = () => {
+		setSelectedCollection('')
+		setPage('collections')
 	}
 
-	const handleCreate = async () => {
-		try {
-			setLoading(true)
-			await switchChain()
-			
-			const { name, symbol } = input
-			const contractFactory = getContract(FC_ADDRESS, FC_ABI)
-			const salt = randomNumber(1, 100000000000000)
-			console.log(contractFactory)
-			const tx = await contractFactory.deployERC721(IMPLEMENT_ADDRESS, name, symbol, salt.toFixed(0))
-			console.log(tx)
-			setLoading(false)
-		} catch (err) {
-			console.log('Create collection:', err)
-			setLoading(false)
-		}
-	}
-
-	return (
-		<Div>
-			<Title>Create a collection</Title>
-			<Spacing size={40} />
-			<label>Enter name of collection</label>
-			<Spacing size={8} />
-			<Input placeholder='name' name='name' value={input.name} onChange={handleInput} />
-			<Spacing size={20} />
-			<label>Put symbol of collection</label>
-			<Spacing size={8} />
-			<Input placeholder='symbol' name='symbol' value={input.symbol} onChange={handleInput} />
-			<Spacing size={40} />
-			<Button
-				loading={loading}
-				disabled={!input.name.length || !input.symbol.length || loading}
-				stretched size="l"
-				mode="secondary"
-				onClick={handleCreate}
-			>
-				Create collection
-			</Button>
-		</Div>
+	return (<>
+		{page === 'collections' && <>
+			<Tabs style={{ borderRadius: '6px' }}>
+				<TabsItem
+					selected={tab === 'list'}
+					onClick={() => setTab('list')}
+					id="tab-list"
+					aria-controls="tab-content-list"
+				>
+					Collection List
+				</TabsItem>
+				<TabsItem
+					selected={tab === 'create'}
+					onClick={() => setTab('create')}
+					id="tab-create"
+					aria-controls="tab-content-create"
+				>
+					Create Collection
+				</TabsItem>
+			</Tabs>
+			<Spacing size={25} />
+			{tab === 'list'
+				&& <Group id="tab-content-list" aria-labelledby="tab-list" role="tabpanel">
+					<CollectionList goToCreateCollection={()=>setTab('create')} selectCollection={selectCollection} />
+				</Group>}
+			{tab === 'create'
+				&& <Group id="tab-content-create" aria-labelledby="tab-create" role="tabpanel">
+					<CreateCollection goToRelease={() => setTab('list')} />
+				</Group>}
+		</>}
+		{page === 'release' && <CreateRelease onBack={onBack} selectedCollection={selectedCollection} />}
+	</>
 	)
 };
 
