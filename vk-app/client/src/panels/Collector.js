@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { CustomSelect, CustomSelectOption, Div, FormItem, Group, Select, Spacing, SplitLayout, Tabs, TabsItem } from '@vkontakte/vkui';
+import { CustomSelect, CustomSelectOption, Div, FormItem, Group, SegmentedControl, Select, Spacing, SplitLayout, Tabs, TabsItem } from '@vkontakte/vkui';
 import { AllCollection } from '../modules/AllCollection';
 import { OwnReleases } from '../modules/OwnReleases';
 import { CollectionItem } from '../modules/CollectionItem';
@@ -33,8 +33,19 @@ const Collector = () => {
     <SplitLayout style={{ display: 'block' }} popout={popout}>
       <Div>
         <Div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <FormItem style={{ width: '40%' }} top="Filter">
-            <CustomSelect
+          <FormItem >
+            <Div>
+              На этой странице можно посмотреть все коллекции и релизы платформы. Выбери между всеит коллекциями, релизами доступными для минта тебе и теми к, которые уже у тебя на кошельке
+            </Div>
+            <Spacing size={20} />
+            <SegmentedControl
+              size="m"
+              name="report-type"
+              value={selectType}
+              onChange={(value) => setSelectType(value)}
+              options={options}
+            />
+            {/* <CustomSelect
               value={selectType}
               placeholder="Не задан"
               options={options}
@@ -42,7 +53,7 @@ const Collector = () => {
               renderOption={({ option, ...restProps }) => (
                 <CustomSelectOption {...restProps} />
               )}
-            />
+            /> */}
           </FormItem>
           <p>
 

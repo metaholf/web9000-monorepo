@@ -20,7 +20,7 @@ export const ReleasesInWallet = () => {
       list.slice(list.length - 10, list.length).forEach(async (collection) => {
         const contract = getContract(collection['sc'], ERC721Bbi)
         const tx = await contract.getUserTokens(account)
-        console.log(tx, 'tx')
+        console.log(tx.length, 'tx')
         const res = tx.map(item => item?.toString())
         const data = res.filter(item => !!item)
         if (data?.length) {
