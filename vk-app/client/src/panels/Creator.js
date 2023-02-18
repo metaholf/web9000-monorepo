@@ -1,63 +1,70 @@
-import React, { useState } from 'react';
-import { Group, Spacing, Tabs, TabsItem } from '@vkontakte/vkui';
-import { CreateCollection } from '../modules/CreateCollection';
-import { CollectionList } from '../modules/CollectionList';
-import { CreateRelease } from '../modules/CreateRelease';
-import { Icon20ListAddOutline } from '@vkontakte/icons';
-import { Icon24Settings } from '@vkontakte/icons'; 
-import { tabItemStyle } from '../config/styles';
+import { Icon20AddCircle } from "@vkontakte/icons"
+import { CardGrid, Div, Spinner, Card, Button, Title, Spacing, SplitLayout } from "@vkontakte/vkui"
+import { useState } from "react"
+import { Modal } from "../components/Modal"
+import { useCollectionList } from "../hooks/useCollectionList"
+import { shortAddress } from "../utils/shortAddress"
+import { CreateCollection } from "../modules/CreateCollection"
+import { CreateRelease } from "../modules/CreateRelease"
 
-const Creator = () => {
-	const [tab, setTab] = useState('list');
-	const [page, setPage] = useState('collections')
-	const [selectedCollection, setSelectedCollection] = useState('')
+const buttonGridStyle = { width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '20px' }
 
-	const selectCollection = (address) => {
-		setSelectedCollection(address)
-		setPage('release')
-	}
-	const onBack = () => {
-		setSelectedCollection('')
-		setPage('collections')
-	}
+export const Creator = () => {
+	const { list, load, refetch } = useCollectionList()
+	const [popout, setPopout] = useState(null);
+	const onClose = () => setPopout(null)
 
-	return (<>
-		{page === 'collections' && <>
-			<Tabs style={{ borderRadius: '6px' }}>
-				<TabsItem
-					after={<Icon20ListAddOutline />}
-					style={tabItemStyle}
-					selected={tab === 'list'}
-					onClick={() => setTab('list')}
-					id="tab-list"
-					aria-controls="tab-content-list"
-				>
-					Collection List
-				</TabsItem>
-				<TabsItem
-					after={<Icon24Settings />}
-					style={tabItemStyle}
-					selected={tab === 'create'}
-					onClick={() => setTab('create')}
-					id="tab-create"
-					aria-controls="tab-content-create"
-				>
-					Create Collection
-				</TabsItem>
-			</Tabs>
-			<Spacing size={25} />
-			{tab === 'list'
-				&& <Group id="tab-content-list" aria-labelledby="tab-list" role="tabpanel">
-					<CollectionList goToCreateCollection={() => setTab('create')} selectCollection={selectCollection} />
-				</Group>}
-			{tab === 'create'
-				&& <Group id="tab-content-create" aria-labelledby="tab-create" role="tabpanel">
-					<CreateCollection goToRelease={() => setTab('list')} />
-				</Group>}
-		</>}
-		{page === 'release' && <CreateRelease onBack={onBack} selectedCollection={selectedCollection} />}
-	</>
+	const onCreateCollection = () => setPopout(
+		<Modal onClose={onClose} title='Add new collection' >
+			<CreateCollection onFinish={() => {
+				onClose()
+				refetch()
+			}} />
+		</Modal >);
+
+	const onCreateRelease = (sc) => setPopout(
+		<Modal onClose={onClose} title='Add new collection' >
+			<CreateRelease selectedCollection={sc} onFinish={() => {
+				onClose()
+				refetch()
+			}} />
+		</Modal >);
+
+	if (load) return (
+		<Div>
+			<Spinner size="large" style={{ margin: '20px 0' }} />
+		</Div>)
+
+	return (
+		<SplitLayout style={{ display: 'block' }} popout={popout}>
+			<Div>
+				<Title style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+					All your collections are available for release. <br />
+					For the release, choose any them.
+					<Button size='m' onClick={onCreateCollection} before={<Icon20AddCircle />}> Add collection
+					</Button>
+				</Title>
+				<Spacing size={40} />
+				<CardGrid>
+					{list.length ? [...list].reverse().map((item) =>
+						<Card key={item['sc']}>
+							<Button style={buttonGridStyle} onClick={() => {
+								onCreateRelease(item['sc'])
+							}}>
+								<p>Name: {item['name']}</p>
+								<p>Symbol: {item['symbol']}</p>
+								<span>Address: {shortAddress(item['sc'])}</span>
+							</Button>
+						</Card>) : null}
+				</CardGrid>
+				{!list.length && <>
+					<Div style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+						<Div>List is empty... Create a collection</Div>
+						<Spacing size={20} />
+						<Button onClick={onCreateCollection}>Create</Button>
+					</Div>
+				</>}
+			</Div>
+		</SplitLayout>
 	)
-};
-
-export default Creator;
+}

@@ -1,7 +1,5 @@
-import { CardGrid, Div, Spacing, Spinner, Title } from "@vkontakte/vkui"
+import { CardGrid, Div, Spinner } from "@vkontakte/vkui"
 import { useEffect, useState } from "react"
-import { CustomTooltip } from "../components/CustomTooltip"
-import { configText } from "../config"
 import { useAllCollectionList } from "../hooks/useCollectionList"
 import { getContract } from "../utils/getContract"
 import ERC721Bbi from '../config/abi/erc721.json'
@@ -22,7 +20,7 @@ export const ReleasesInWallet = () => {
       list.slice(list.length - 10, list.length).forEach(async (collection) => {
         const contract = getContract(collection['sc'], ERC721Bbi)
         const tx = await contract.getUserTokens(account)
-        console.log(tx, 'tx')
+        console.log(tx.length, 'tx')
         const res = tx.map(item => item?.toString())
         const data = res.filter(item => !!item)
         if (data?.length) {
@@ -50,14 +48,7 @@ export const ReleasesInWallet = () => {
     </Div>)
 
   return (
-    <Div>
-      <Title style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <p style={{ flex: 'none' }}>
-          Releases in my wallet
-        </p>
-        <CustomTooltip text={configText.collectorReleasesInWallet} />
-      </Title>
-      <Spacing size={40} />
+    <Div style={{ widows: '100%' }}>
       <CardGrid>
         {myList.length ? [...myList].map((item, i) =>
           <ReleaseCard item={item} key={i} link={`https://goerli.etherscan.io/address/${item}`} />

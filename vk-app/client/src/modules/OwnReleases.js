@@ -1,12 +1,9 @@
-import { Button, Card, CardGrid, Div, Spacing, Spinner, Title } from "@vkontakte/vkui"
+import { CardGrid, Div, Spinner} from "@vkontakte/vkui"
 import { useEffect, useState } from "react"
 import { useAllCollectionList } from "../hooks/useCollectionList"
 import { getContract } from "../utils/getContract"
 import ERC721Abi from '../config/abi/erc721.json'
 import { ReleaseCard } from "../components/ReleaseCard"
-import { CustomTooltip } from "../components/CustomTooltip"
-import { configText } from "../config"
-import { ethers } from "ethers"
 
 export const OwnReleases = () => {
   const { list, load } = useAllCollectionList()
@@ -92,14 +89,7 @@ export const OwnReleases = () => {
     </Div>)
 
   return (
-    <Div>
-      <Title style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <p style={{ flex: 'none' }}>
-          Own Releases
-        </p>
-        <CustomTooltip text={configText.collectorOwnReleases} />
-      </Title>
-      <Spacing size={40} />
+    <Div style={{ widows: '100%' }}>
       <CardGrid>
         {myList.length ? [...myList].map((item, i) =>
           <ReleaseCard load={fetchingMint} item={item} onClick={handleMint} key={i} />

@@ -9,7 +9,7 @@ export const getCollectionTokens = (sc) => {
     setLoad(true)
     let response = await fetch(`${process.env.REACT_APP_API_URL}/getCollectionTokens`, {
       method: 'POST',
-      body: JSON.stringify({ collection: sc }),
+      body: JSON.stringify({ collection: sc.toLowerCase() }),
       referrerPolicy: 'no-referrer',
       headers: {
         'Access-Control-Allow-Origin': '*',

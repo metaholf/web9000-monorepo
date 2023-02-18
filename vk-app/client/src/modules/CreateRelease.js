@@ -4,8 +4,9 @@ import { getContract } from "../utils/getContract"
 import ERC721Abi from '../config/abi/erc721.json'
 import { CustomTooltip } from "../components/CustomTooltip"
 import { configText } from "../config"
+import { Icon12Add } from "@vkontakte/icons"
 
-export const CreateRelease = ({ onBack, selectedCollection }) => {
+export const CreateRelease = ({ onFinish, selectedCollection }) => {
   const [nodes, setNodes] = useState([''])
   const [load, setLoad] = useState(false)
 
@@ -18,7 +19,7 @@ export const CreateRelease = ({ onBack, selectedCollection }) => {
     newArr[i] = value
     setNodes(newArr)
   }
-  console.log(nodes)
+
   const handleCreate = async () => {
     try {
       setLoad(true)
@@ -39,7 +40,7 @@ export const CreateRelease = ({ onBack, selectedCollection }) => {
 
       const tx = await erc721Contract.createRelease(root)
       console.log(tx)
-      onBack()
+      onFinish()
       setLoad(false)
     } catch (err) {
       console.log('Create release:', err)
@@ -50,36 +51,28 @@ export const CreateRelease = ({ onBack, selectedCollection }) => {
   const isValid = nodes.filter(el => el.length > 0)
 
   return (
-    <Div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Title style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: '70%', gap: '10px' }}>
-          <p style={{ flex: 'none' }}>
-            Create a Release
-          </p>
-          <CustomTooltip text={configText.creatorCreateRelease} />
-        </Title>
-        <Button onClick={onBack}>Back</Button>
-      </div>
+    <Div style={{ maxHeight: '400px',  overflowY: 'auto'  }}>
       <Spacing size={40} />
       <Div>
         <label>Add values</label>
       </Div>
       {
         nodes.map((item, i) =>
-          <Div key={i}>
-            <label>{i + 1}</label>
-            <Spacing size={10} />
-            <Input onChange={({ target: { value } }) => handleChange(value, i)} placeholder='to_address' name='to_address' value={item} />
-          </Div>
+          <div key={i}>
+            <Div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <label>{i + 1}.</label>
+              <Input style={{ width: '100%' }} onChange={({ target: { value } }) => handleChange(value, i)} placeholder='to_address' name='to_address' value={item} />
+            </Div>
+          </div>
         )
       }
       <Spacing size={20} />
       <Div>
-        <Button stretched size="l" mode="secondary" onClick={handleAdd}>
+        <Button before={<Icon12Add />} stretched size="l" mode="secondary" onClick={handleAdd}>
           Add node
         </Button>
       </Div>
-      <Spacing size={30} />
+      <Spacing size={10} />
       <Div>
         <Button disabled={isValid.length < nodes.length || load} loading={load} stretched size="l" mode="secondary" onClick={handleCreate}>
           Create Release

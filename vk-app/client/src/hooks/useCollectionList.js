@@ -23,12 +23,16 @@ export const useCollectionList = () => {
     }
   }
 
+  const refetch = () => {
+    getList()
+  }
+
   useEffect(() => {
     if (!list.length)
       getList()
-  }, [list.length])
+  }, [])
 
-  return { load, list }
+  return { load, list, refetch }
 }
 
 export const useAllCollectionList = () => {

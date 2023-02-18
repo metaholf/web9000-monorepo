@@ -1,11 +1,9 @@
-import { Button, Div, Input, Spacing, Title } from "@vkontakte/vkui"
+import { Button, Div, Input, Spacing } from "@vkontakte/vkui"
 import { useState } from "react"
-import { CustomTooltip } from "../components/CustomTooltip"
-import { configText } from "../config"
 import { getFactoryContract } from "../utils/getContract"
 import { randomNumber } from "../utils/randomNumber"
 
-export const CreateCollection = ({ goToRelease }) => {
+export const CreateCollection = ({ onFinish }) => {
   const [input, setInput] = useState({ name: '', symbol: '' })
   const [loading, setLoading] = useState(false)
 
@@ -25,7 +23,7 @@ export const CreateCollection = ({ goToRelease }) => {
       tx.wait().then((res) => {
         console.log(res);
         setLoading(false);
-        goToRelease()
+        onFinish()
         return;
       }).catch((err) => {
         console.log(err);
@@ -39,12 +37,12 @@ export const CreateCollection = ({ goToRelease }) => {
   }
   return (
     <Div>
-      <Title style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <p style={{ flex: 'none' }}>
-          Create a collection
-        </p>
-        <CustomTooltip text={configText.creatorCollection} />
-      </Title>
+
+      <h4> Fill in the fields and press Create button. </h4>
+      <p>
+        Then sign the transaction via your crypto wallet and <br />
+        you will see new collection in list your own collections
+      </p>
       <Spacing size={40} />
       <label>Enter name of collection</label>
       <Spacing size={8} />
@@ -64,6 +62,6 @@ export const CreateCollection = ({ goToRelease }) => {
       >
         Create collection
       </Button>
-    </Div>
+    </Div >
   )
 }
