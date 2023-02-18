@@ -2,6 +2,8 @@ import { Button, Div, Input, Spacing, Title } from "@vkontakte/vkui"
 import { useState } from "react"
 import { getContract } from "../utils/getContract"
 import ERC721Abi from '../config/abi/erc721.json'
+import { CustomTooltip } from "../components/CustomTooltip"
+import { configText } from "../config"
 
 export const CreateRelease = ({ onBack, selectedCollection }) => {
   const [nodes, setNodes] = useState([''])
@@ -22,10 +24,10 @@ export const CreateRelease = ({ onBack, selectedCollection }) => {
       setLoad(true)
       const erc721Contract = getContract(selectedCollection, ERC721Abi)
       const releaseId = await erc721Contract.totalReleases()
-      const lowerCaseNodes = nodes.map(item=>item.toLowerCase())
+      const lowerCaseNodes = nodes.map(item => item.toLowerCase())
       let response = await fetch(`${process.env.REACT_APP_API_URL}/merkle-tree`, {
         method: 'POST',
-        body: JSON.stringify({ nodes:lowerCaseNodes, releaseId: releaseId.toString(), collection: selectedCollection.toLowerCase() }),
+        body: JSON.stringify({ nodes: lowerCaseNodes, releaseId: releaseId.toString(), collection: selectedCollection.toLowerCase() }),
         referrerPolicy: 'no-referrer',
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -50,20 +52,27 @@ export const CreateRelease = ({ onBack, selectedCollection }) => {
   return (
     <Div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Title>Create Release</Title>
+        <Title style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: '70%', gap: '10px' }}>
+          <p style={{ flex: 'none' }}>
+            Create a Release
+          </p>
+          <CustomTooltip text={configText.creatorCreateRelease} />
+        </Title>
         <Button onClick={onBack}>Back</Button>
       </div>
       <Spacing size={40} />
       <Div>
         <label>Add values</label>
       </Div>
-      {nodes.map((item, i) =>
-        <Div key={i}>
-          <label>{i + 1}</label>
-          <Spacing size={10} />
-          <Input onChange={({ target: { value } }) => handleChange(value, i)} placeholder='to_address' name='to_address' value={item} />
-        </Div>
-      )}
+      {
+        nodes.map((item, i) =>
+          <Div key={i}>
+            <label>{i + 1}</label>
+            <Spacing size={10} />
+            <Input onChange={({ target: { value } }) => handleChange(value, i)} placeholder='to_address' name='to_address' value={item} />
+          </Div>
+        )
+      }
       <Spacing size={20} />
       <Div>
         <Button stretched size="l" mode="secondary" onClick={handleAdd}>
@@ -76,6 +85,6 @@ export const CreateRelease = ({ onBack, selectedCollection }) => {
           Create Release
         </Button>
       </Div>
-    </Div>
+    </Div >
   )
 }

@@ -1,4 +1,7 @@
-import { CardGrid, Div, Spinner, Card, Button, Title, Spacing } from "@vkontakte/vkui"
+import { Icon20QuestionOutline } from "@vkontakte/icons"
+import { CardGrid, Div, Spinner, Card, Button, Title, Spacing, SplitLayout, ActionSheet, ActionSheetItem } from "@vkontakte/vkui"
+import { CustomTooltip } from "../components/CustomTooltip"
+import { configText } from "../config"
 import { useCollectionList } from "../hooks/useCollectionList"
 import { shortAddress } from "../utils/shortAddress"
 
@@ -7,14 +10,21 @@ const buttonGridStyle = { width: '100%', height: '100%', display: 'flex', flexDi
 export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
   const { list, load } = useCollectionList()
 
+
   if (load) return (
     <Div>
       <Spinner size="large" style={{ margin: '20px 0' }} />
     </Div>)
 
   return (
+
     <Div>
-      <Title>Choose a collection for release</Title>
+      <Title style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <p style={{ flex: 'none' }}>
+          Choose a collection for release
+        </p>
+        <CustomTooltip text={configText.creatorCollectionList} />
+      </Title>
       <Spacing size={40} />
       <CardGrid>
         {list.length ? [...list].reverse().map((item) =>
@@ -34,5 +44,6 @@ export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
         </Div>
       </>}
     </Div>
+
   )
 }

@@ -1,4 +1,6 @@
 import { Button, Card, CardGrid, Div, Spacing, Spinner, Title } from "@vkontakte/vkui"
+import { CustomTooltip } from "../components/CustomTooltip"
+import { configText } from "../config"
 import { useAllCollectionList } from "../hooks/useCollectionList"
 import { shortAddress } from "../utils/shortAddress"
 
@@ -15,7 +17,12 @@ export const AllCollection = ({ selectCollection }) => {
 
   return (
     <Div>
-      <Title>Select interested collection:</Title>
+      <Title style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <p style={{ flex: 'none' }}>
+          Select interested collection
+        </p>
+        <CustomTooltip text={configText.collectorAllCollections} />
+      </Title>
       <Spacing size={40} />
       <CardGrid>
         {list.length ? [...list].reverse().map((item) =>

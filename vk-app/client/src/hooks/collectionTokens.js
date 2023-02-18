@@ -31,7 +31,7 @@ export const getCollectionTokens = (sc) => {
   useEffect(() => {
     if (!list.length)
       getList()
-  }, [list])
+  }, [list.length])
 
   return { load, list }
 }
@@ -67,7 +67,7 @@ export const getUserTokens = (user) => {
   useEffect(() => {
     if (!list.length)
       getList()
-  }, [list])
+  }, [list.length])
 
   return { load, list }
 }

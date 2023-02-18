@@ -1,6 +1,7 @@
 import { Button, Div, Input, Spacing, Title } from "@vkontakte/vkui"
 import { useState } from "react"
-import { IMPLEMENT_ADDRESS } from "../config"
+import { CustomTooltip } from "../components/CustomTooltip"
+import { configText } from "../config"
 import { getFactoryContract } from "../utils/getContract"
 import { randomNumber } from "../utils/randomNumber"
 
@@ -19,7 +20,7 @@ export const CreateCollection = ({ goToRelease }) => {
       const { name, symbol } = input
       const contractFactory = getFactoryContract()
       const salt = randomNumber(1, 100000000000000)
-      const tx = await contractFactory.deployERC721(IMPLEMENT_ADDRESS, name, symbol, salt.toFixed(0))
+      const tx = await contractFactory.deployERC721(process.env.REACT_APP_IMPLEMENT_ADDRESS, name, symbol, salt.toFixed(0))
       console.log(tx)
       tx.wait().then((res) => {
         console.log(res);
@@ -38,7 +39,12 @@ export const CreateCollection = ({ goToRelease }) => {
   }
   return (
     <Div>
-      <Title>Create a collection</Title>
+      <Title style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <p style={{ flex: 'none' }}>
+          Create a collection
+        </p>
+        <CustomTooltip text={configText.creatorCollection} />
+      </Title>
       <Spacing size={40} />
       <label>Enter name of collection</label>
       <Spacing size={8} />

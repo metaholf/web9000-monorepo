@@ -1,15 +1,15 @@
-import { useState } from "react"
-import { CardGrid, Button, Div, Card, Spacing, Title } from "@vkontakte/vkui"
+import { CardGrid, Button, Div, Card, Spacing, Title, Spinner } from "@vkontakte/vkui"
 import { getCollectionTokens } from "../hooks/collectionTokens"
-import { getIdentIcon } from "../utils/fetPicelImg"
-
-const buttonGridStyle = { width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '20px' }
+import { ReleaseCard } from "../components/ReleaseCard"
 
 export const CollectionItem = ({ sc, name, symbol, owner, onBack }) => {
-  console.log(sc, name, symbol, owner)
-
   const { list, load } = getCollectionTokens(sc)
-  console.log(list)
+
+  if (load) return (
+    <Div>
+      <Spinner size="large" style={{ margin: '20px 0' }} />
+    </Div>
+  )
 
   return (
     <Div>
@@ -22,12 +22,7 @@ export const CollectionItem = ({ sc, name, symbol, owner, onBack }) => {
       <Spacing size={40} />
       <CardGrid>
         {list.length ? list.map((item, i) =>
-          <Card key={i}>
-            <Button style={buttonGridStyle} >
-              <p>leafId: {item['leafId']}</p>
-              <p>releaseId: {item['releaseId']}</p>
-            </Button>
-          </Card>) : null}
+          <ReleaseCard item={item} key={i} />) : <Div>Has not released yet</Div>}
       </CardGrid>
 
       <Spacing size={40} />

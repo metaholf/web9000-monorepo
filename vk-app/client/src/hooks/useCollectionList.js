@@ -10,6 +10,8 @@ export const useCollectionList = () => {
       const [account] = await window.ethereum?.request({
         method: "eth_requestAccounts",
       });
+
+      console.log(account)
       setLoad(true)
       const factoryContract = getFactoryContract()
       const res = await factoryContract.getAllCollectionsByOwner(account)
@@ -24,7 +26,7 @@ export const useCollectionList = () => {
   useEffect(() => {
     if (!list.length)
       getList()
-  }, [list])
+  }, [list.length])
 
   return { load, list }
 }
@@ -49,7 +51,7 @@ export const useAllCollectionList = () => {
   useEffect(() => {
     if (!list.length)
       getList()
-  }, [list])
+  }, [list.length])
 
   return { load, list }
 }

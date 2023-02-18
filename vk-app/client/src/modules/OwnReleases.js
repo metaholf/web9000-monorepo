@@ -3,11 +3,16 @@ import { useEffect, useState } from "react"
 import { useAllCollectionList } from "../hooks/useCollectionList"
 import { getContract } from "../utils/getContract"
 import ERC721Abi from '../config/abi/erc721.json'
+import { ReleaseCard } from "../components/ReleaseCard"
+import { CustomTooltip } from "../components/CustomTooltip"
+import { configText } from "../config"
+import { ethers } from "ethers"
 
 export const OwnReleases = () => {
   const { list, load } = useAllCollectionList()
   const [fetching, setFetching] = useState(load)
   const [myList, setMyList] = useState([])
+  const [fetchingMint, setFetchingMint] = useState(false)
 
   const getCollectionsCanGet = async () => {
     setFetching(true)
@@ -28,7 +33,22 @@ export const OwnReleases = () => {
       });
       const data = (await response.json()).result || {};
       console.log(data)
-      setMyList(Object.values(data))
+
+      const arr = Object.values(data)
+      const nonClaimed = []
+      arr.forEach(async (item) => {
+        try {
+          const contractCollection = getContract(item['collection'], ERC721Abi)
+          const res = await contractCollection.claimed(item['releaseId'], item['leafId'])
+          if (!res)
+            nonClaimed.push(item)
+
+        }
+        catch (err) {
+          console.log('claimedBatch: ', err)
+        }
+        setMyList([...nonClaimed])
+      })
 
 
       setFetching(false)
@@ -40,10 +60,22 @@ export const OwnReleases = () => {
 
   const handleMint = async ({ releaseId, leafId, proof, collection }) => {
     try {
+      setFetchingMint(true)
       const contractCollection = getContract(collection, ERC721Abi)
       const tx = await contractCollection.mint(releaseId, leafId, proof)
-      console.log(tx)
+
+      tx.wait().then((res) => {
+        console.log(res);
+        getCollectionsCanGet()
+        setFetchingMint(false);
+        return;
+      }).catch((err) => {
+        console.log(err);
+        setFetchingMint(false);
+        return;
+      });
     } catch (err) {
+      setFetchingMint(false)
       console.log('handleMint: ', err)
     }
   }
@@ -61,18 +93,17 @@ export const OwnReleases = () => {
 
   return (
     <Div>
-      <Title>OwnReleases</Title>
-      <Spacing size={40} />
+      <Title style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <p style={{ flex: 'none' }}>
+          Own Releases
+        </p>
+        <CustomTooltip text={configText.collectorOwnReleases} />
+      </Title>
       <Spacing size={40} />
       <CardGrid>
-        {myList.length ? myList.map((item, i) =>
-          <Card key={i}>
-            <p>leafId: {item['leafId']}</p>
-            <p>releaseId: {item['releaseId']}</p>
-            <Button onClick={() => handleMint(item)}>
-              Mint
-            </Button>
-          </Card>) : null}
+        {myList.length ? [...myList].map((item, i) =>
+          <ReleaseCard load={fetchingMint} item={item} onClick={handleMint} key={i} />
+        ) : <Div>You don't have hft for mint yet.</Div>}
       </CardGrid>
     </Div>
   )
