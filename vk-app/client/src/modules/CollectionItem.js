@@ -2,7 +2,7 @@ import { CardGrid, Button, Div, Card, Spacing, Title, Spinner } from "@vkontakte
 import { getCollectionTokens } from "../hooks/collectionTokens"
 import { ReleaseCard } from "../components/ReleaseCard"
 
-export const CollectionItem = ({ sc, name, symbol, owner, onBack }) => {
+export const CollectionItem = ({ sc, name, symbol, owner, onClose }) => {
   const { list, load } = getCollectionTokens(sc)
 
   if (load) return (
@@ -12,12 +12,11 @@ export const CollectionItem = ({ sc, name, symbol, owner, onBack }) => {
   )
 
   return (
-    <Div>
+    <Div style={{ maxHeight: '400px', overflowY: 'auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Title>{name} ({symbol})</Title>
 
         <p>owner: {owner}</p>
-        <Button onClick={onBack}>Back</Button>
       </div>
       <Spacing size={40} />
       <CardGrid>

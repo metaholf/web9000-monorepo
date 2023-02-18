@@ -13,11 +13,10 @@ import {
 	Button,
 	Panel,
 } from '@vkontakte/vkui';
-import '@vkontakte/vkui/dist/vkui.css';
-import { checkChain } from "./utils/switchChain"
+import '@vkontakte/vkui/dist/vkui.css'; ``
 import { Icon20BrushOutline, Icon20CubeBoxOutline } from '@vkontakte/icons';
 
-import Creator from './panels/Creator';
+import { Creator } from './panels/Creator';
 import Collector from './panels/Collector';
 import { DEFAULT_CHAIN_ID } from './config';
 import { tabItemStyle } from './config/styles';
