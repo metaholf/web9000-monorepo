@@ -2,6 +2,7 @@ const express = require('express');
 const { config } = require('./src/config');
 const app = express();
 const port = config.PORT;
+const ip = config.IP;
 const cors = require('cors');
 const rateLimit = require('express-rate-limit')
 const { merkleTreeController, getProofsController, getCollectionTokens } = require('./src/controllers/merkleTree');
@@ -31,6 +32,6 @@ app.post(config.RELAYER, apiLimiter, relayerController)
 
 app.post(config.COLLECTION_TOKENS, getCollectionTokens)
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+app.listen(port, ip, () => {
+  console.log(`Example app listening on port ${port}, ${ip}`)
 })

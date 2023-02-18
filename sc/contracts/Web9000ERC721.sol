@@ -139,6 +139,17 @@ contract Web9000ERC721 is
         return(result);
     }
 
+    function claimedBatch(uint256[] memory releaseId_, uint256[] memory leafId_) external view returns(bool[] memory) {
+        require(releaseId_.length == leafId_.length, "wrong length");
+        bool[] memory result = new bool[](releaseId_.length);
+
+        for (uint256 i = 0; i < releaseId_.length; i++) {
+            result[i] = claimed[releaseId_[i]][leafId_[i]];
+        }
+
+        return(result);
+    }
+
     function tokenURI(
         uint256 tokenId_
     )
