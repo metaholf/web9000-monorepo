@@ -5,6 +5,7 @@ import ERC721Abi from '../config/abi/erc721.json'
 import { CustomTooltip } from "../components/CustomTooltip"
 import { configText } from "../config"
 import { Icon12Add } from "@vkontakte/icons"
+import { prepareRelayerData, sendTxToRelayer } from "../utils/relayerHelper"
 
 export const CreateRelease = ({ onFinish, selectedCollection }) => {
   const [nodes, setNodes] = useState([''])
@@ -38,7 +39,12 @@ export const CreateRelease = ({ onFinish, selectedCollection }) => {
 
       const { root } = await response.json() || {};
 
-      const tx = await erc721Contract.createRelease(root)
+      //
+      // GAS RELAY FIX
+      //
+      // const tx = await erc721Contract.createRelease(root)
+      const relayData = await prepareRelayerData(erc721Contract.address, erc721Contract.interface.encodeFunctionData("createRelease", [root]));
+      const tx = await sendTxToRelayer(relayData);
       console.log(tx)
       onFinish()
       setLoad(false)
@@ -54,7 +60,7 @@ export const CreateRelease = ({ onFinish, selectedCollection }) => {
     <Div style={{ maxHeight: '400px',  overflowY: 'auto'  }}>
       <Spacing size={40} />
       <Div>
-        <label>Add values</label>
+        <label>Заполните список получателей</label>
       </Div>
       {
         nodes.map((item, i) =>
@@ -69,13 +75,13 @@ export const CreateRelease = ({ onFinish, selectedCollection }) => {
       <Spacing size={20} />
       <Div>
         <Button before={<Icon12Add />} stretched size="l" mode="secondary" onClick={handleAdd}>
-          Add node
+          Добавить получателя
         </Button>
       </Div>
       <Spacing size={10} />
       <Div>
         <Button disabled={isValid.length < nodes.length || load} loading={load} stretched size="l" mode="secondary" onClick={handleCreate}>
-          Create Release
+          Выпустить токены
         </Button>
       </Div>
     </Div >

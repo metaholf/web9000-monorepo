@@ -2,6 +2,8 @@ import { Button, Div, Input, Spacing } from "@vkontakte/vkui"
 import { useState } from "react"
 import { getFactoryContract } from "../utils/getContract"
 import { randomNumber } from "../utils/randomNumber"
+import { ethers } from 'ethers'
+import { prepareRelayerData, sendTxToRelayer } from "../utils/relayerHelper"
 
 export const CreateCollection = ({ onFinish }) => {
   const [input, setInput] = useState({ name: '', symbol: '' })
@@ -17,8 +19,13 @@ export const CreateCollection = ({ onFinish }) => {
 
       const { name, symbol } = input
       const contractFactory = getFactoryContract()
-      const salt = randomNumber(1, 100000000000000)
-      const tx = await contractFactory.deployERC721(process.env.REACT_APP_IMPLEMENT_ADDRESS, name, symbol, salt.toFixed(0))
+      const salt = (ethers.BigNumber.from(ethers.utils.randomBytes(32))).toString();
+      //
+      // GAS RELAY FIX
+      //
+      const relayData = await prepareRelayerData(contractFactory.address, contractFactory.interface.encodeFunctionData("deployERC721", [process.env.REACT_APP_IMPLEMENT_ADDRESS, name, symbol, salt]));
+      const tx = await sendTxToRelayer(relayData);
+      // const tx = await contractFactory.deployERC721(process.env.REACT_APP_IMPLEMENT_ADDRESS, name, symbol, salt.toFixed(0))
       console.log(tx)
       tx.wait().then((res) => {
         console.log(res);
@@ -38,21 +45,20 @@ export const CreateCollection = ({ onFinish }) => {
   return (
     <Div>
 
-      <h4> Fill in the fields and press Create button. </h4>
+      <h4> Заполните поля и подтвердите создание коллекции </h4>
       <p>
-        Then sign the transaction via your crypto wallet and <br />
-        you will see new collection in list your own collections
+        В появившей коллекции вы сможете выпускать NFT токены <br />
       </p>
       <Spacing size={40} />
-      <label>Enter name of collection</label>
+      <label>Введите полное название коллекции</label>
       <Spacing size={8} />
       <Input placeholder='name' name='name' value={input.name} onChange={handleInput} />
       <Spacing size={20} />
-      <label>Put symbol of collection</label>
+      <label>Введите биржевой тикер коллекции</label>
       <Spacing size={8} />
       <Input placeholder='symbol' name='symbol' value={input.symbol} onChange={handleInput} />
       <Spacing size={40} />
-      {loading && <Div>It may take a few time...</Div>}
+      {loading && <Div>Ожидание транзакции...</Div>}
       <Button
         loading={loading}
         disabled={!input.name.length || !input.symbol.length || loading}
@@ -60,7 +66,7 @@ export const CreateCollection = ({ onFinish }) => {
         mode="secondary"
         onClick={handleCreate}
       >
-        Create collection
+        Создать коллекцию
       </Button>
     </Div >
   )

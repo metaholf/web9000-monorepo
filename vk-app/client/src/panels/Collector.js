@@ -12,9 +12,9 @@ import { ReleasesInWallet } from '../modules/ReleasesInWallet';
 import { Modal } from '../components/Modal';
 
 const options = [
-  { label: 'All collections', value: 'all' },
-  { label: 'Available for me', value: 'own' },
-  { label: 'In my wallet', value: 'wallet' }
+  { label: 'Все коллекции', value: 'all' },
+  { label: 'Доступные мне', value: 'own' },
+  { label: 'Мой кошелек', value: 'wallet' }
 ]
 
 const Collector = () => {
@@ -25,7 +25,7 @@ const Collector = () => {
   const onClose = () => setPopout(null)
 
   const selectCollection = (collection) => setPopout(
-    <Modal onClose={onClose} title='Add new collection' >
+    <Modal onClose={onClose} title='Список токенов коллекции' >
       <CollectionItem onBack={onClose} {...collection} />
     </Modal >);
 
@@ -35,7 +35,7 @@ const Collector = () => {
         <Div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <FormItem >
             <Div>
-              На этой странице можно посмотреть все коллекции и релизы платформы. Выбери между всеит коллекциями, релизами доступными для минта тебе и теми к, которые уже у тебя на кошельке
+              В этом разделе можно ознакомиться с выпущенными на платформе NFT, а также заминтить собственные NFT
             </Div>
             <Spacing size={20} />
             <SegmentedControl

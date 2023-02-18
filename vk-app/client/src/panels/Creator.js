@@ -15,7 +15,7 @@ export const Creator = () => {
 	const onClose = () => setPopout(null)
 
 	const onCreateCollection = () => setPopout(
-		<Modal onClose={onClose} title='Add new collection' >
+		<Modal onClose={onClose} title='Создать новую коллекцию' >
 			<CreateCollection onFinish={() => {
 				onClose()
 				refetch()
@@ -23,7 +23,7 @@ export const Creator = () => {
 		</Modal >);
 
 	const onCreateRelease = (sc) => setPopout(
-		<Modal onClose={onClose} title='Add new collection' >
+		<Modal onClose={onClose} title='Создать новую коллекцию' >
 			<CreateRelease selectedCollection={sc} onFinish={() => {
 				onClose()
 				refetch()
@@ -39,9 +39,8 @@ export const Creator = () => {
 		<SplitLayout style={{ display: 'block' }} popout={popout}>
 			<Div>
 				<Title style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-					All your collections are available for release. <br />
-					For the release, choose any them.
-					<Button size='m' onClick={onCreateCollection} before={<Icon20AddCircle />}> Add collection
+					Нажмите на коллекцию, чтобы выпустить NFT <br />
+					<Button size='m' onClick={onCreateCollection} before={<Icon20AddCircle />}> Создать коллекцию
 					</Button>
 				</Title>
 				<Spacing size={40} />
@@ -51,17 +50,17 @@ export const Creator = () => {
 							<Button style={buttonGridStyle} onClick={() => {
 								onCreateRelease(item['sc'])
 							}}>
-								<p>Name: {item['name']}</p>
-								<p>Symbol: {item['symbol']}</p>
-								<span>Address: {shortAddress(item['sc'])}</span>
+								<p>Название: {item['name']}</p>
+								<p>Тикер: {item['symbol']}</p>
+								<span>Адрес: {shortAddress(item['sc'])}</span>
 							</Button>
 						</Card>) : null}
 				</CardGrid>
 				{!list.length && <>
 					<Div style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-						<Div>List is empty... Create a collection</Div>
+						<Div>Список ваших коллекций пуст</Div>
 						<Spacing size={20} />
-						<Button onClick={onCreateCollection}>Create</Button>
+						<Button onClick={onCreateCollection}>Создать коллекцию</Button>
 					</Div>
 				</>}
 			</Div>

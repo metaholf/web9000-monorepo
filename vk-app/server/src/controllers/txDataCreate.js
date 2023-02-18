@@ -6,7 +6,7 @@ const txDataCreate = async (req, res) => {
   if (req.body) {
     console.log(req.body)
     const provider = new ethers.JsonRpcProvider('https://eth-goerli.g.alchemy.com/v2/0HXwg7aousuhqGHZcAs7YY5LVW-BLi4F')
-    contract = new ethers.Contract('0x784384762f0E70EEE87289d4208B26b9b356cE22', FC_ABI, provider)
+    contract = new ethers.Contract('0xe355241b5ed488Cdf8268290Db364E33DB3E2473', FC_ABI, provider)
     const data = contract.interface.encodeFunctionData('deployERC721', [...req.body])
     res.send(JSON.stringify(data))
 

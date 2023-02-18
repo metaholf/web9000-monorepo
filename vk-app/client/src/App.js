@@ -56,11 +56,11 @@ const App = () => {
 			<AdaptivityProvider>
 				<AppRoot>
 					<PanelHeader>
-						WEB9000
+						WEB9000 NFT master
 					</PanelHeader>
 					<Panel>
-						<FormStatus header="*The application is only available on the Goreli TestNet network" mode={wrongNetwork ? "error" : ''} >
-							{wrongNetwork && 'Please change network  in your wallet to use the app correctly'}
+						<FormStatus header="*Приложение работает только на тестовой сети Goerli" mode={wrongNetwork ? "error" : ''} >
+							{wrongNetwork && 'Пожалуйста, смените сеть, чтобы приложение работало корректно'}
 						</FormStatus>
 						<Spacing size={20} />
 						<Group>
@@ -73,7 +73,7 @@ const App = () => {
 									id="tab-collector"
 									aria-controls="tab-content-collector"
 								>
-									Collector
+									Обзор NFT
 								</TabsItem>
 								<TabsItem
 									style={tabItemStyle}
@@ -83,7 +83,7 @@ const App = () => {
 									id="tab-creator"
 									aria-controls="tab-content-creator"
 								>
-									Creator
+									Создать NFT
 								</TabsItem>
 							</Tabs>
 							<Spacing size={30} />

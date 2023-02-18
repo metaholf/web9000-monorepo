@@ -4,6 +4,7 @@ import { useAllCollectionList } from "../hooks/useCollectionList"
 import { getContract } from "../utils/getContract"
 import ERC721Abi from '../config/abi/erc721.json'
 import { ReleaseCard } from "../components/ReleaseCard"
+import { prepareRelayerData, sendTxToRelayer } from "../utils/relayerHelper"
 
 export const OwnReleases = () => {
   const { list, load } = useAllCollectionList()
@@ -59,7 +60,13 @@ export const OwnReleases = () => {
     try {
       setFetchingMint(true)
       const contractCollection = getContract(collection, ERC721Abi)
-      const tx = await contractCollection.mint(releaseId, leafId, proof)
+
+      //
+      // GAS RELAY FIX
+      //
+      const relayData = await prepareRelayerData(contractCollection.address, contractCollection.interface.encodeFunctionData("mint", [releaseId, leafId, proof]));
+      const tx = await sendTxToRelayer(relayData);
+      // const tx = await contractCollection.mint(releaseId, leafId, proof)
 
       tx.wait().then((res) => {
         console.log(res);
@@ -92,8 +99,8 @@ export const OwnReleases = () => {
     <Div style={{ widows: '100%' }}>
       <CardGrid>
         {myList.length ? [...myList].map((item, i) =>
-          <ReleaseCard load={fetchingMint} item={item} onClick={handleMint} key={i} />
-        ) : <Div>You don't have hft for mint yet.</Div>}
+          <ReleaseCard load={fetchingMint} item={item} collection={item['collection']} onClick={handleMint} key={i} />
+        ) : <Div>Список доступных токенов пуст</Div>}
       </CardGrid>
     </Div>
   )

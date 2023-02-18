@@ -41,6 +41,10 @@ export const useAllCollectionList = () => {
 
   const getList = async () => {
     try {
+      const [account] = await window.ethereum?.request({
+        method: "eth_requestAccounts",
+      });
+
       setLoad(true)
       const factoryContract = getFactoryContract()
       const res = await factoryContract.getAllCollections()

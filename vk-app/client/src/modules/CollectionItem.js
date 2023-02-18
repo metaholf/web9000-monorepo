@@ -21,7 +21,7 @@ export const CollectionItem = ({ sc, name, symbol, owner, onClose }) => {
       <Spacing size={40} />
       <CardGrid>
         {list.length ? list.map((item, i) =>
-          <ReleaseCard item={item} key={i} />) : <Div>Has not released yet</Div>}
+          <ReleaseCard item={item} key={i} collection={sc} />) : <Div>Has not released yet</Div>}
       </CardGrid>
 
       <Spacing size={40} />

@@ -19,15 +19,15 @@ export const AllCollection = ({ selectCollection }) => {
         {list.length ? [...list].reverse().map((item) =>
           <Card key={item['sc']}>
             <Button style={buttonGridStyle} onClick={() => selectCollection({ sc: item['sc'], name: item['name'], symbol: item['symbol'], owner: item['owner'] })}>
-              <p>Name: {item['name']}</p>
-              <p>Symbol: {item['symbol']}</p>
-              <span>Address: {shortAddress(item['sc'])}</span>
+              <p>Название: {item['name']}</p>
+              <p>Тикер: {item['symbol']}</p>
+              <span>Адрес: {shortAddress(item['sc'])}</span>
             </Button>
           </Card>) : null}
       </CardGrid>
       {!list.length && <>
         <Div style={{ padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-          <Div>List is empty... </Div>
+          <Div>Список коллекций пуст </Div>
         </Div>
       </>}
     </Div>
