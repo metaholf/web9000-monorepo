@@ -14,7 +14,7 @@ export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
   const onClose = () => setPopout(null)
 
   const onCreateCollection = () => setPopout(
-    <Modal onClose={onClose} title='Add new collection' >
+    <Modal onClose={onClose} title='Создать новую коллекцию' >
       <CreateCollection onFinish={() => {
         onClose()
         refetch()
@@ -22,7 +22,7 @@ export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
     </Modal >);
 
   const onCreateRelease = () => setPopout(
-    <Modal onClose={onClose} title='Add new collection' >
+    <Modal onClose={onClose} title='Создать новую коллекцию' >
       <CreateCollection onFinish={() => {
         onClose()
         refetch()
@@ -47,9 +47,9 @@ export const CollectionList = ({ selectCollection, goToCreateCollection }) => {
           {list.length ? [...list].reverse().map((item) =>
             <Card key={item['sc']}>
               <Button style={buttonGridStyle} onClick={() => selectCollection(item['sc'])}>
-                <p>Name: {item['name']}</p>
-                <p>Symbol: {item['symbol']}</p>
-                <span>Address: {shortAddress(item['sc'])}</span>
+                <p>Название: {item['name']}</p>
+                <p>Тикер: {item['symbol']}</p>
+                <span>Адрес: {shortAddress(item['sc'])}</span>
               </Button>
             </Card>) : null}
         </CardGrid>

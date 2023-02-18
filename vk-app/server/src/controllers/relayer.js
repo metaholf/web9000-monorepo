@@ -178,7 +178,7 @@ const relayerController = async (req, res) => {
       data: targetData,
     }
 
-    const provider = new ethers.JsonRpcProvider('https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161')
+    const provider = new ethers.JsonRpcProvider('https://eth-goerli.g.alchemy.com/v2/7aOrFcBLYIJaijRSF1KbG6JQF3mXEyIs')//'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161')
     const signer = new ethers.Wallet(config.RELAYER_PRIVATE_KEY, provider);
     const FACTORY_ABI = [
       {
@@ -414,7 +414,6 @@ const relayerController = async (req, res) => {
     ]
 
     let contract = new ethers.Contract(config.TRUSTED_FORWARDER_ADDRESS, RELAYER_ABI, signer)
-    // let contract = new ethers.Contract("0x784384762f0e70eee87289d4208b26b9b356ce22", FACTORY_ABI, signer)
 
 
     // try {
@@ -423,41 +422,47 @@ const relayerController = async (req, res) => {
     //   res.send(JSON.stringify({result: "exception"}))
     // }
 
-    if (nonceMemory === -1) {
-      nonceMemory = await provider.getTransactionCount(signer.address, "pending")
-    } else {
-      nonceMemory++
-    }
+    // if (nonceMemory === -1) {
+    //   nonceMemory = await provider.getTransactionCount(signer.address, "pending")
+    // } else {
+    //   nonceMemory++
+    // }
 
     
     
-    // currentNonce = await provider.getTransactionCount(signer.address, "pending")
     // console.log(await nonceManager.getAddress())/
     // console.log(nonceManager.incrementTransactionCount())
     // console.log(await nonceManager.getTransactionCount("pending"))
     // console.log(Object.getOwnPropertyNames(nonceManager.__proto__));
-    // const nonce = await nonceManager.getTransactionCount("pending");//await provider.getTransactionCount(signer.address, "pending"    
+    // const gasPrice = (await provider.getFeeData()).gasPrice
+    // const resultGasPrice = +gasPrice.toString() * 2;
+    // console.log();
+    // console.log(+gasPrice.toString() * 2, gasPrice)
     // send relay tx
-    // let tx = await contract.execute(txMsg, signature);
-
-    let tx;
-    try {
-      // tx = await contract.deployERC721("0x4cea311a911edfec6d83567507a4acf663557c06", "A", "A", Math.floor(Math.random() * 100000000000), {nonce: nonceMemory});
-      tx =  await contract.execute(txMsg, signature, {nonce: nonceMemory});
-    } catch(error) {
-      console.log(error);
-      try {
-        nonceMemory = await provider.getTransactionCount(signer.address, "pending");
-        tx =  await contract.execute(txMsg, signature, {nonce: nonceMemory});
-      } catch(error) {
-        console.log(error);
-        res.send(JSON.stringify({result: "not ok"}))
-      }
-    }
+    // const nonce = await nonceManager.getTransactionCount("pending");
+    const nonce = await provider.getTransactionCount(signer.address, "pending")
+    let tx = await contract.execute(txMsg, signature, {nonce: nonce});
+    
+    // console.log(gasPrice)
+    // console.log(resultGasPrice)
+    console.log(nonce)
+    console.log(tx)
+    // let tx;
+    // try {
+    //   // tx = await contract.deployERC721("0x4cea311a911edfec6d83567507a4acf663557c06", "A", "A", Math.floor(Math.random() * 100000000000), {nonce: nonceMemory});
+    //   tx =  await contract.execute(txMsg, signature, {nonce: nonceMemory});
+    // } catch(error) {
+    //   console.log(error);
+    //   try {
+    //     nonceMemory = await provider.getTransactionCount(signer.address, "pending");
+    //     tx =  await contract.execute(txMsg, signature, {nonce: nonceMemory});
+    //   } catch(error) {
+    //     console.log(error);
+    //     res.send(JSON.stringify({result: "not ok"}))
+    //   }
+    // }
 
   
-    console.log(tx)
-    console.log(nonceMemory)
     
     
     
