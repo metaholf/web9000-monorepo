@@ -15,20 +15,20 @@ export const CollectionItem = ({ sc, name, symbol, owner, onBack }) => {
     <Div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Title>{name} ({symbol})</Title>
-        
+
         <p>owner: {owner}</p>
         <Button onClick={onBack}>Back</Button>
       </div>
       <Spacing size={40} />
       <CardGrid>
-        {list.length ? list.map((item) =>
-          <Card>
+        {list.length ? list.map((item, i) =>
+          <Card key={i}>
             <Button style={buttonGridStyle} >
               <p>leafId: {item['leafId']}</p>
               <p>releaseId: {item['releaseId']}</p>
             </Button>
           </Card>) : null}
-        </CardGrid>
+      </CardGrid>
 
       <Spacing size={40} />
     </Div>

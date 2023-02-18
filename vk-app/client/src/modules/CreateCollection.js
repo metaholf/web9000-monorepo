@@ -3,7 +3,6 @@ import { useState } from "react"
 import { IMPLEMENT_ADDRESS } from "../config"
 import { getFactoryContract } from "../utils/getContract"
 import { randomNumber } from "../utils/randomNumber"
-import { switchChain } from "../utils/switchChain"
 
 export const CreateCollection = ({ goToRelease }) => {
   const [input, setInput] = useState({ name: '', symbol: '' })
@@ -16,7 +15,6 @@ export const CreateCollection = ({ goToRelease }) => {
   const handleCreate = async () => {
     try {
       setLoading(true)
-      await switchChain()
 
       const { name, symbol } = input
       const contractFactory = getFactoryContract()

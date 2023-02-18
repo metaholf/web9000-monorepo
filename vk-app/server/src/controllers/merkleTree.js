@@ -712,11 +712,11 @@ const merkleTreeController = async (req, res) => {
     // console.log(req.body)
     const releaseId = req.body.releaseId
     const nodes = req.body.nodes
-    const collection = req.body.collection
+    const collection = req.body.collection.toLowerCase()
     // console.log(nodes)
     let elems = [];
     nodes.forEach((element, i) => {
-      let hash = ethers.solidityPackedKeccak256(["uint256", "address", "uint256"],[releaseId, element, i]);
+      let hash = ethers.solidityPackedKeccak256(["uint256", "address", "uint256"], [releaseId, element, i]);
       elems.push(hash);
     });
 
@@ -734,7 +734,7 @@ const merkleTreeController = async (req, res) => {
       //
       let userProofState;
       try {
-        userProofState = await db.get(`proofs-${nodes[i]}`) 
+        userProofState = await db.get(`proofs-${nodes[i]}`)
         userProofState = JSON.parse(userProofState);
         // console.log("old");
       } catch (error) {
@@ -764,7 +764,7 @@ const merkleTreeController = async (req, res) => {
       //
       let collectionState;
       try {
-        collectionState = await db.get(`collection-${collection}`) 
+        collectionState = await db.get(`collection-${collection}`)
         collectionState = JSON.parse(collectionState);
       } catch (error) {
         collectionState = {};
@@ -781,7 +781,7 @@ const merkleTreeController = async (req, res) => {
 
     }
 
-    res.send(JSON.stringify({root: root}))
+    res.send(JSON.stringify({ root: root }))
 
   } else
     res.send('invalid data')
@@ -791,16 +791,16 @@ const merkleTreeController = async (req, res) => {
 const getCollectionTokens = async (req, res) => {
   if (req.body) {
     const collection = req.body.collection
-    
+
     let collectionState;
     try {
-      collectionState = await db.get(`collection-${collection}`) 
+      collectionState = await db.get(`collection-${collection}`)
       collectionState = JSON.parse(collectionState);
     } catch (error) {
       collectionState = {};
     }
 
-    res.send(JSON.stringify({result: collectionState}))
+    res.send(JSON.stringify({ result: collectionState }))
 
   } else
     res.send('invalid data')
@@ -810,18 +810,18 @@ const getCollectionTokens = async (req, res) => {
 const getProofsController = async (req, res) => {
   if (req.body) {
     const target = req.body.address
-    // console.log(target)
 
     try {
-      userProofState = await db.get(`proofs-${target}`) 
+      userProofState = await db.get(`proofs-${target?.toLowerCase()}`)
       userProofState = JSON.parse(userProofState);
     } catch (error) {
+      console.log(error)
       userProofState = {};
     }
     // console.log(userProofState);
 
     // const provider = new ethers.JsonRpcProvider('https://eth-goerli.g.alchemy.com/v2/0HXwg7aousuhqGHZcAs7YY5LVW-BLi4F')
-    
+
     // Object.keys(userProofState).forEach(async (key) => {
     //   let contract = new ethers.Contract(userProofState[key].collection, ERC721_ABI, provider)
     //   console.log(userProofState[key].collection);
@@ -830,10 +830,10 @@ const getProofsController = async (req, res) => {
 
     // });
 
-    res.send(JSON.stringify({result: userProofState}))
+    res.send(JSON.stringify({ result: userProofState }))
 
   } else
     res.send('invalid data')
 }
 
-module.exports = {merkleTreeController, getProofsController, getCollectionTokens}
+module.exports = { merkleTreeController, getProofsController, getCollectionTokens }

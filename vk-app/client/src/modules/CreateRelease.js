@@ -22,9 +22,10 @@ export const CreateRelease = ({ onBack, selectedCollection }) => {
       setLoad(true)
       const erc721Contract = getContract(selectedCollection, ERC721Abi)
       const releaseId = await erc721Contract.totalReleases()
-      let response = await fetch('http://localhost:4000/merkle-tree', {
+      const lowerCaseNodes = nodes.map(item=>item.toLowerCase())
+      let response = await fetch(`${process.env.REACT_APP_API_URL}/merkle-tree`, {
         method: 'POST',
-        body: JSON.stringify({ nodes, releaseId: releaseId.toString(), collection: selectedCollection }),
+        body: JSON.stringify({ nodes:lowerCaseNodes, releaseId: releaseId.toString(), collection: selectedCollection.toLowerCase() }),
         referrerPolicy: 'no-referrer',
         headers: {
           'Access-Control-Allow-Origin': '*',

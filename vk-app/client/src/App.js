@@ -9,17 +9,22 @@ import {
 	Group,
 	PanelHeader,
 	Spacing,
+	FormStatus,
+	Button,
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import { checkChain, switchChain } from "./utils/switchChain"
 
 import Creator from './panels/Creator';
 import Collector from './panels/Collector';
 import { UserBlock } from './components/UserBlock';
+import { DEFAULT_CHAIN_ID } from './config';
 
 const App = () => {
 	const [scheme, setScheme] = useState('bright_light')
 	const [fetchedUser, setUser] = useState(null);
-	const [selected, setSelected] = useState('collector');
+	const [selected, setSelected] = useState('creator');
+	const [wrongNetwork, setWrongNetwork] = useState(false)
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -35,12 +40,39 @@ const App = () => {
 		fetchData();
 	}, []);
 
+	const getChain = async () => {
+		const chainId = await checkChain()
+		if (chainId !== DEFAULT_CHAIN_ID) {
+			setWrongNetwork(true)
+		}
+	}
+
+
+	useEffect(() => {
+		if (window?.ethereum) {
+			getChain()
+			window?.ethereum?.on("chainChanged", async function (chainId) {
+				if (chainId === DEFAULT_CHAIN_ID) {
+					setWrongNetwork(false)
+				} else {
+					setWrongNetwork(true)
+				}
+			})
+		}
+	}, [window?.ethereum])
+
 
 	return (
 		<ConfigProvider scheme={scheme}>
 			<AdaptivityProvider>
 				<AppRoot>
-					<PanelHeader>WEB9000</PanelHeader>
+					<PanelHeader>
+						WEB9000
+					</PanelHeader>
+					<FormStatus header="*The application is only available on the Goreli TestNet network" mode={wrongNetwork ? "error" : ''} >
+						{wrongNetwork && 'Please change network  in your wallet to use the app correctly'}
+					</FormStatus>
+					<Spacing size={20} />
 					{fetchedUser && <UserBlock data={fetchedUser} />}
 					<Group>
 						<Tabs >
@@ -73,7 +105,7 @@ const App = () => {
 					</Group>
 				</AppRoot>
 			</AdaptivityProvider>
-		</ConfigProvider>
+		</ConfigProvider >
 	);
 }
 
