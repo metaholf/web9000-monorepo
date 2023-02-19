@@ -2,8 +2,6 @@ import { Button, Div, Input, Spacing, Title } from "@vkontakte/vkui"
 import { useState } from "react"
 import { getContract } from "../utils/getContract"
 import ERC721Abi from '../config/abi/erc721.json'
-import { CustomTooltip } from "../components/CustomTooltip"
-import { configText } from "../config"
 import { Icon12Add } from "@vkontakte/icons"
 import { prepareRelayerData, sendTxToRelayer } from "../utils/relayerHelper"
 

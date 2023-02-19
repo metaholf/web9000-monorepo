@@ -1,10 +1,10 @@
 import { Icon24Cancel } from "@vkontakte/icons";
 import { Button, Div, Group, PopoutWrapper, Title } from "@vkontakte/vkui";
 
-export const Modal = ({ onClose, title, children }) => {
+export const Modal = ({ onClose, title, children, minWidth = '600px' }) => {
   return (
     <PopoutWrapper onClick={onClose}>
-      <Group style={{ minWidth: '600px', padding: '40px' }}>
+      <Group style={{ minWidth, padding: '40px' }}>
         <Div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Title>{title}</Title>
           <Button onClick={onClose}>

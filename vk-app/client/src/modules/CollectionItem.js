@@ -13,7 +13,7 @@ export const CollectionItem = ({ sc, name, symbol, owner, onClose }) => {
 
   return (
     <Div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div>
         <Title>{name} ({symbol})</Title>
 
         <p>owner: {owner}</p>
@@ -21,7 +21,7 @@ export const CollectionItem = ({ sc, name, symbol, owner, onClose }) => {
       <Spacing size={40} />
       <CardGrid>
         {list.length ? list.map((item, i) =>
-          <ReleaseCard item={item} key={i} collection={sc} />) : <Div>Has not released yet</Div>}
+          <ReleaseCard item={item} key={i} collection={sc} />) : <Div>В этой коллекции нет релизов</Div>}
       </CardGrid>
 
       <Spacing size={40} />
