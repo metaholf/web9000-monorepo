@@ -99,7 +99,7 @@ export const OwnReleases = () => {
     <Div style={{ widows: '100%' }}>
       <CardGrid>
         {myList.length ? [...myList].map((item, i) =>
-          <ReleaseCard load={fetchingMint} item={item} collection={item['collection']} onClick={handleMint} key={i} />
+          <ReleaseCard load={fetchingMint} item={item} buttonText='Получить' collection={item['collection']} onClick={handleMint} key={i} />
         ) : <Div>Список доступных токенов пуст</Div>}
       </CardGrid>
     </Div>

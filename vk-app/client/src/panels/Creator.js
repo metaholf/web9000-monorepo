@@ -23,7 +23,7 @@ export const Creator = () => {
 		</Modal >);
 
 	const onCreateRelease = (sc) => setPopout(
-		<Modal onClose={onClose} title='Создать новую коллекцию' >
+		<Modal onClose={onClose} title='Создать релиз' >
 			<CreateRelease selectedCollection={sc} onFinish={() => {
 				onClose()
 				refetch()
